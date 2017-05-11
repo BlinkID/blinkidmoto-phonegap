@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="com.microblink.BlinkIdScanner" 
+        version="1.1.3">
+
+    <name>BlinkId-Moto</name>
+    <description>Component for scanning VIN numbers and license plates</description>
+    <license>MIT</license>
+    <keywords>ID</keywords>
+    <author>MicroBlink Team info@microblink.com</author>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+        <engine name="cordova-android" version=">=4.0.0" />
+    </engines>   
+
+    <js-module src="www/blinkIdScanner.js" name="BlinkIdScanner">
+        <clobbers target="cordova.plugins.blinkIdScanner" />
+    </js-module>
+    
+    <hook type="after_platform_add" src="addEmbedded.js" />
+
+    <platform name="ios">
+        <source-file src="src/ios/sources/CDVBlinkIdScanner.m" />
+        <header-file src="src/ios/sources/CDVBlinkIdScanner.h" />
+        <source-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlayViewController.m" />
+        <header-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlayViewController.h" />
+        <source-file src="src/ios/sources/FormOcrOverlay/PPPivotView.m" />
+        <header-file src="src/ios/sources/FormOcrOverlay/PPPivotView.h" />
+        <source-file src="src/ios/sources/FormOcrOverlay/PPScanElement.m" />
+        <header-file src="src/ios/sources/FormOcrOverlay/PPScanElement.h" />
+        <source-file src="src/ios/sources/FormOcrOverlay/PPScanResultView.m" />
+        <header-file src="src/ios/sources/FormOcrOverlay/PPScanResultView.h" />
+        <source-file src="src/ios/sources/MBParsers.m" />
+        <header-file src="src/ios/sources/MBParsers.h" />
+        <source-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage1ViewController.m" />
+        <header-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage1ViewController.h" />
+        <source-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage2ViewController.m" />
+        <header-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage2ViewController.h" />
+        <source-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage3ViewController.m" />
+        <header-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPage3ViewController.h" />
+        <source-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPageViewController.m" />
+        <header-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpPageViewController.h" />
+        <source-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpViewController.m" />
+        <header-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelpViewController.h" />
+        
+        <framework src="libc++.dylib" />
+        <framework src="libz.dylib" />
+        <framework src="libiconv.dylib" />
+
+        <framework src="CoreVideo.framework" />
+        <framework src="CoreText.framework" />
+        <framework src="CoreMedia.framework" />
+        <framework src="QuartzCore.framework" />
+        <framework src="AudioToolbox.framework" />
+        <framework src="OpenGLES.framework" />
+        <framework src="Accelerate.framework" />
+        
+        <framework src="src/ios/framework/MicroBlinkDynamic.framework" custom="true" embed="true" />
+        
+        <preference name="CAMERA_USAGE_DESCRIPTION" default=" " />
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+            <string>$CAMERA_USAGE_DESCRIPTION</string>
+        </config-file>
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit-selected.imageset/icon-exit-selected.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit-selected.imageset/icon-exit-selected@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit-selected.imageset/icon-exit-selected@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit.imageset/icon-exit.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit.imageset/icon-exit@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-exit.imageset/icon-exit@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight-selected.imageset/icon-flashlight-selected.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight-selected.imageset/icon-flashlight-selected@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight-selected.imageset/icon-flashlight-selected@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight.imageset/icon-flashlight.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight.imageset/icon-flashlight@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-flashlight.imageset/icon-flashlight@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help-selected.imageset/icon-help-selected.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help-selected.imageset/icon-help-selected@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help-selected.imageset/icon-help-selected@3x.png" />
+    
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-lr.imageset/scan-corner-lr.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-lr.imageset/scan-corner-lr@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-lr.imageset/scan-corner-lr@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help.imageset/icon-help.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help.imageset/icon-help@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-help.imageset/icon-help@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big-selected.imageset/icon-ok-big-selected.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big-selected.imageset/icon-ok-big-selected@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big-selected.imageset/icon-ok-big-selected@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big.imageset/icon-ok-big.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big.imageset/icon-ok-big@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-ok-big.imageset/icon-ok-big@3x.png" />
+
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip-selected.imageset/icon_skip_selected_blink_ocr.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip-selected.imageset/icon_skip_selected_blink_ocr@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip-selected.imageset/icon_skip_selected_blink_ocr@3x.png" />
+
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip.imageset/icon_skip_blink_ocr.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip.imageset/icon_skip_blink_ocr@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/icon-skip.imageset/icon_skip_blink_ocr@3x.png" />
+
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ll.imageset/scan-corner-ll.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ll.imageset/scan-corner-ll@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ll.imageset/scan-corner-ll@3x.png" />
+
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ul.imageset/scan-corner-ul.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ul.imageset/scan-corner-ul@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ul.imageset/scan-corner-ul@3x.png" />
+
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ur.imageset/scan-corner-ur.png"/>
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ur.imageset/scan-corner-ur@2x.png" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlay.xcassets/scan-corner-ur.imageset/scan-corner-ur@3x.png" />
+        
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/01-help.imageset/01-help.png"/>
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/01-help.imageset/01-help@2x.png" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/01-help.imageset/01-help@3x.png" />
+
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/02-help.imageset/02-help.png"/>
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/02-help.imageset/02-help@2x.png" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/02-help.imageset/02-help@3x.png" />
+        
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/03-help.imageset/03-help.png"/>
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/03-help.imageset/03-help@2x.png" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/03-help.imageset/03-help@3x.png" />
+
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit-selected.imageset/help-exit-selected.png"/>
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit-selected.imageset/help-exit-selected@2x.png" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit-selected.imageset/help-exit-selected@3x.png" />
+
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit.imageset/help-exit.png"/>
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit.imageset/help-exit@2x.png" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.xcassets/help-exit.imageset/help-exit@3x.png" />
+        
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPFormOcrOverlayViewController.xib" />
+        <resource-file src="src/ios/sources/FormOcrOverlay/PPScanResultView.xib" />
+        <resource-file src="src/ios/sources/OcrHelp/PPBlinkOcrHelp.storyboard" />
+
+        <resource-file src="src/ios/framework/MicroBlink.bundle" />
+        
+        <config-file target="config.xml" parent="/*">
+            <feature name="blinkIdScanner">
+                <param name="ios-package" value="CDVBlinkIdScanner" />
+            </feature>
+        </config-file>
+    </platform>
+    
+</plugin>

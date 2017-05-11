@@ -1,0 +1,6 @@
+framework module MicroBlinkDynamic {
+  umbrella header "MicroBlinkDynamic.h"
+
+  export *
+  module * { export * }
+}
