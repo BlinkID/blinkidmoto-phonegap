@@ -55,7 +55,7 @@ var app = {
          * Use these scanner types
          * Available: "PDF417", "USDL", "Bar Decoder", "Zxing", "MRTD", "EUDL", "UKDL", "DEDL", "MyKad", "DocumentFace"
          */
-        var types = ["PDF417", "UKDL", "MRTD"];
+        var types = ["VIN", "LicensePlate"];
 
         /**
          * Image type defines type of the image that will be returned in scan result (image is returned as Base64 encoded JPEG)
@@ -70,7 +70,7 @@ var app = {
         // Note that each platform requires its own license key
 
         // This license key allows setting overlay views for this application ID: com.microblink.blinkid
-        var licenseiOs = "SKM5EHOC-2RYRUIEI-E5CT7PZZ-BKMLKJQU-XCIJBEEQ-SCIJBEEQ-SCIJAMA4-CTCG2HA7"; // valid until 2017-05-23
+        var licenseiOs = "FJDHBCFC-VPQMNNKV-6EKMUSTE-ZWBQKA2E-66LVGM5U-SAOG7RHA-2G2RLR55-COSW4YTN"; // valid until 2017-07-14
 
         // This license is only valid for package name "com.microblink.blinkid"
         var licenseAndroid = "NFRZVYWD-MCK7SSO7-TJ7ZWOC4-AT2AYDM7-JDHZQMHY-V3PZU4SX-54PGUFQM-AUX5RGYJ";
