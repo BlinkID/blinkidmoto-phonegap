@@ -40,10 +40,9 @@
 - (void)scan:(CDVInvokedUrlCommand *)command {
 
     [self setLastCommand:command];
-
-    self.scanElements = [[MBParsers getParsers] mutableCopy];
-
+    
     PPCameraCoordinator *coordinator = [self createCordinator];
+    [self initializeScanElements];
     [self presentFormScannerWithCoordinator:coordinator];
 }
 
@@ -55,18 +54,42 @@
 
     if ([PPCameraCoordinator isScanningUnsupportedForCameraType:PPCameraTypeBack error:&error]) {
         NSString *messageString = [error localizedDescription];
-        [[[UIAlertView alloc] initWithTitle:@"Warning"
-                                    message:messageString
-                                   delegate:nil
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil, nil] show];
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Warning"
+                                                                                 message:messageString
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        {
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                   style: UIAlertActionStyleDefault
+                                                                 handler:^(UIAlertAction * _Nonnull action) {
+            }];
+            [alertController addAction:cancelAction];
+        }
+        
+        [[self viewController] presentViewController:alertController animated:YES completion:nil];
+        
         return nil;
     }
-
+    
     PPSettings *settings = [[PPSettings alloc] init];
-    settings.licenseSettings.licenseKey = @"5MX4D3AJ-WJIJ7RFA-6W34264A-LPJKKGLM-F2JREAQ3-HS2RKZZU-4DI3LNIU-XS6WZN5Q";
+    settings.licenseSettings.licenseKey = [self.lastCommand argumentAtIndex:2];
+    
     PPCameraCoordinator *coordinator = [[PPCameraCoordinator alloc] initWithSettings:settings];
     return coordinator;
+}
+
+- (void)initializeScanElements {
+    self.scanElements = [[NSMutableArray alloc] init];
+    NSArray *recognizerTypes = [self.lastCommand argumentAtIndex:0];
+
+    if ([self shouldUseVINRecognizerForTypes:recognizerTypes]) {
+        [self.scanElements addObject:[MBParsers getVINParser]];
+    }
+    
+    if ([self shouldUseLicensePlateRecognizerForTypes:recognizerTypes]) {
+        [self.scanElements addObject:[MBParsers getLicensePlateParser]];
+    }
 }
 
 
@@ -79,7 +102,7 @@
     if (self.scanElements.count > 0) {
         PPFormOcrOverlayViewController *overlayViewController =
         [PPFormOcrOverlayViewController allocFromNibName:@"PPFormOcrOverlayViewController"];
-
+        
         overlayViewController.scanElements = self.scanElements;
         overlayViewController.coordinator = coordinator;
         overlayViewController.delegate = self;
@@ -93,12 +116,19 @@
         [[self viewController] presentViewController:scanningViewController animated:YES completion:nil];
 
     } else {
-        UIAlertView *theAlert = [[UIAlertView alloc] initWithTitle:@"No Scan Elements Present"
-                                                           message:@"Tap Settings to add Scan Elements"
-                                                          delegate:self
-                                                 cancelButtonTitle:@"OK"
-                                                 otherButtonTitles:nil];
-        [theAlert show];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"No Scan Elements Present"
+                                                                                 message:@"Tap Settings to add Scan Elements"
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        {
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                   style: UIAlertActionStyleDefault
+                                                                 handler:^(UIAlertAction * _Nonnull action) {
+                                                                 }];
+            [alertController addAction:cancelAction];
+        }
+        
+        [[self viewController] presentViewController:alertController animated:YES completion:nil];
     }
 }
 
@@ -128,12 +158,22 @@
     [resultDict setObject:[NSNumber numberWithInt:(cancelled ? 1 : 0)] forKey:@"cancelled"];
 
     for (PPScanElement *element in self.scanElements) {
-        [resultDict setObject:element.value forKey:element.identifier];
+        if (element.value != nil) {
+            [resultDict setObject:element.value forKey:element.identifier];
+        }
     }
 
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
 
     [self.commandDelegate sendPluginResult:result callbackId:self.lastCommand.callbackId];
+}
+
+- (BOOL)shouldUseVINRecognizerForTypes:(NSArray *)recognizerTypes {
+    return [recognizerTypes containsObject:@"VIN"];
+}
+
+- (BOOL)shouldUseLicensePlateRecognizerForTypes:(NSArray *)recognizerTypes {
+    return [recognizerTypes containsObject:@"LicensePlate"];
 }
 
 @end
