@@ -53,7 +53,8 @@ var app = {
 
         /**
          * Use these scanner types
-         * Available: "PDF417", "USDL", "Bar Decoder", "Zxing", "MRTD", "EUDL", "UKDL", "DEDL", "MyKad", "DocumentFace"
+         * You can choose VIN or LicensePlate or both at the same time
+         * Available: "VIN", "LicensePlate"
          */
         var types = ["VIN", "LicensePlate"];
 
