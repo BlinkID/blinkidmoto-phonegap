@@ -8,8 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+@class PPScanElement;
+
 @interface MBParsers : NSObject
 
-+ (NSArray *)getParsers;
++ (PPScanElement *)getVINParser;
++ (PPScanElement *)getLicensePlateParser;
 
 @end
