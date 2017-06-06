@@ -18,13 +18,24 @@
 @interface CDVBlinkIdScanner : CDVPlugin
 
 /**
- * Starts the scanning process
+ * Starts VIN scanning process
  */
 - (void)scan:(CDVInvokedUrlCommand *)command;
 
 /**
+ * Starts License plate scanning process
+ */
+
+- (void)scanLicensePlate:(CDVInvokedUrlCommand *)command;
+
+/**
  * Returns successful recognition
  */
-- (void)returnAsCancelled:(BOOL)cancelled;
+- (void)returnAsCancelled:(BOOL)cancelled withScanResult:(NSString *)scanResult;
+
+/**
+ * Check if scanning is unsupported
+ */
+- (void)isScanningUnsupportedForCameraType:(CDVInvokedUrlCommand *)command;
 
 @end
