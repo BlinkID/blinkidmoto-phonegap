@@ -11,7 +11,7 @@
 
 @interface PPOcrOverlayViewController ()<PPOcrFinderViewDelegate>
 
-@property (strong, nonatomic) PPOcrResultOverlaySubview *resultOverlay;
+@property (strong, nonatomic) PPModernOcrResultOverlaySubview *resultOverlay;
 
 @property (nonatomic) UIInterfaceOrientation interfaceOrientation;
 
@@ -54,7 +54,7 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
     
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    self.resultOverlay = [[PPOcrResultOverlaySubview alloc] initWithFrame:self.view.bounds];
+    self.resultOverlay = [[PPModernOcrResultOverlaySubview alloc] initWithFrame:self.view.bounds];
     
     // Set overlay subview
     self.resultOverlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
