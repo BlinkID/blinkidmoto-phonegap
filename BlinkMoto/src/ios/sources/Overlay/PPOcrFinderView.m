@@ -664,10 +664,10 @@ static NSString * const kAcceptText = @"accept_text";
 }
 
 - (void)initViewfinderForLandscape {
-    self.viewfinderWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width : self.bounds.size.width * 0.95;
+    self.viewfinderWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width*0.95 : self.bounds.size.width * 0.95;
     self.viewfinderHeightConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ?  self.bounds.size.height * 0.1 : self.bounds.size.height * 0.3;
     
-    self.resultImageViewWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width : self.bounds.size.width * 0.95;
+    self.resultImageViewWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width*0.95 : self.bounds.size.width * 0.95;
     self.resultImageViewHeightConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ?  self.bounds.size.height * 0.1 : self.bounds.size.height * 0.3;
     
     self.viewfinderHorizontalAlignmentConstraint.constant = 0;
