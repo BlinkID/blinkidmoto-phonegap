@@ -19,43 +19,67 @@
     };
 
 /**
- * types: Types of supported scanners (pass as array of desired scanner types):
- *  "PDF417"
- *  "USDL"
- *  "Bar Decoder"
- *  "Zxing"
- *  "MRTD"
- *  "UKDL"
- *  "MyKad"
- *
- * imageType - image type that should be returned if image is captured (depends on used scanner):
- *  "IMAGE_NONE" : do not return image in scan result
- *  "IMAGE_SUCCESSFUL_SCAN" : return full camera frame of successful scan
- *  "IMAGE_CROPPED" : return cropped document image (successful scan)
- *
  * licenseiOS - iOS license key to enable all features (not required)
  * licenseAndroid - Android license key to enable all features (not required)
+ * translation - Dictionary with keys: title_text, cancel_text, repeat_text, accept_text
  */
 
-    BlinkIdScanner.prototype.scan = function (successCallback, errorCallback, types, imageType, licenseiOs, licenseAndroid) {
+    BlinkIdScanner.prototype.scan = function (successCallback, errorCallback, licenseiOs, licenseAndroid, translation) {
         if (errorCallback == null) {
             errorCallback = function () {
             };
         }
 
-        if (typeof errorCallback != "function") {
+        if (typeof errorCallback !== "function") {
             console.log("BlinkIdScanner.scan failure: failure parameter not a function");
             return;
         }
 
-        if (typeof successCallback != "function") {
+        if (typeof successCallback !== "function") {
             console.log("BlinkIdScanner.scan failure: success callback parameter must be a function");
             return;
         }
 
-        exec(successCallback, errorCallback, 'BlinkIdScanner', 'scan', [types, imageType, licenseiOs, licenseAndroid]);
+        exec(successCallback, errorCallback, 'BlinkIdScanner', 'scan', [licenseiOs, licenseAndroid, translation]);
     };
+               
+   BlinkIdScanner.prototype.scanLicensePlate = function (successCallback, errorCallback, licenseiOs, licenseAndroid, translation) {
+       if (errorCallback == null) {
+           errorCallback = function () {
+           };
+       }
+       
+       if (typeof errorCallback !== "function") {
+           console.log("BlinkIdScanner.scanLicensePlate failure: failure parameter not a function");
+           return;
+       }
+       
+       if (typeof successCallback !== "function") {
+           console.log("BlinkIdScanner.scanLicensePlate failure: success callback parameter must be a function");
+           return;
+       }
+       
+       exec(successCallback, errorCallback, 'BlinkIdScanner', 'scanLicensePlate', [licenseiOs, licenseAndroid, translation]);
+   };
+
+      BlinkIdScanner.prototype.isScanningUnsupportedForCameraType = function (successCallback, errorCallback) {
+       if (errorCallback == null) {
+           errorCallback = function () {
+           };
+       }
+       
+       if (typeof errorCallback !== "function") {
+       console.log("BlinkIdScanner.isScanningUnsupportedForCameraType failure: failure parameter not a function");
+       return;
+       }
+       
+       if (typeof successCallback !== "function") {
+           console.log("BlinkIdScanner.isScanningUnsupportedForCameraType failure: success callback parameter must be a function");
+           return;
+       }
+       
+       exec(successCallback, errorCallback, 'BlinkIdScanner', 'isScanningUnsupportedForCameraType');
+   };
 
     var blinkIdScanner = new BlinkIdScanner();
     module.exports = blinkIdScanner;
-

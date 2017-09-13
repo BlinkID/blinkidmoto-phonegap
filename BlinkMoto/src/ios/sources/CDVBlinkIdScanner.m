@@ -19,13 +19,10 @@
 
 #import "CDVBlinkIdScanner.h"
 
-#import <MicroBlinkDynamic/MicroBlinkDynamic.h>
+#import <MicroBlink/MicroBlink.h>
+#import "PPOcrOverlayViewController.h"
 
-
-#import "PPFormOcrOverlayViewController.h"
-#import "MBParsers.h"
-
-@interface CDVBlinkIdScanner () <PPFormOcrOverlayViewControllerDelegate>
+@interface CDVBlinkIdScanner () <PPOcrOverlayViewControllerDelegate>
 
 @property (nonatomic) NSMutableArray *scanElements;
 
@@ -42,8 +39,15 @@
     [self setLastCommand:command];
     
     PPCameraCoordinator *coordinator = [self createCordinator];
-    [self initializeScanElements];
-    [self presentFormScannerWithCoordinator:coordinator];
+    [self presentFormScannerWithCoordinator:coordinator andOcrParserType:VIN];
+}
+
+- (void)scanLicensePlate:(CDVInvokedUrlCommand *)command {
+    
+    [self setLastCommand:command];
+    
+    PPCameraCoordinator *coordinator = [self createCordinator];
+    [self presentFormScannerWithCoordinator:coordinator andOcrParserType:LicensePlate];
 }
 
 #pragma mark - initiate scan
@@ -73,94 +77,58 @@
     }
     
     PPSettings *settings = [[PPSettings alloc] init];
-    settings.licenseSettings.licenseKey = [self.lastCommand argumentAtIndex:2];
-    
+    settings.licenseSettings.licenseKey = [self.lastCommand argumentAtIndex:0];
+    settings.metadataSettings.successfulFrame = YES;
     PPCameraCoordinator *coordinator = [[PPCameraCoordinator alloc] initWithSettings:settings];
     return coordinator;
 }
 
-- (void)initializeScanElements {
-    self.scanElements = [[NSMutableArray alloc] init];
-    NSArray *recognizerTypes = [self.lastCommand argumentAtIndex:0];
-
-    if ([self shouldUseVINRecognizerForTypes:recognizerTypes]) {
-        [self.scanElements addObject:[MBParsers getVINParser]];
-    }
+- (void)presentFormScannerWithCoordinator:(PPCameraCoordinator *)coordinator andOcrParserType:(OcrRecognizerType)ocrRecognizerType {
     
-    if ([self shouldUseLicensePlateRecognizerForTypes:recognizerTypes]) {
-        [self.scanElements addObject:[MBParsers getLicensePlateParser]];
-    }
-}
-
-
-- (void)presentFormScannerWithCoordinator:(PPCameraCoordinator *)coordinator {
-
     if (coordinator == nil) {
         return;
     }
-
-    if (self.scanElements.count > 0) {
-        PPFormOcrOverlayViewController *overlayViewController =
-        [PPFormOcrOverlayViewController allocFromNibName:@"PPFormOcrOverlayViewController"];
-        
-        overlayViewController.scanElements = self.scanElements;
-        overlayViewController.coordinator = coordinator;
-        overlayViewController.delegate = self;
-
-        UIViewController<PPScanningViewController> *scanningViewController =
-        [PPViewControllerFactory cameraViewControllerWithDelegate:nil
-                                            overlayViewController:overlayViewController
-                                                      coordinator:coordinator
-                                                            error:nil];
-
-        [[self viewController] presentViewController:scanningViewController animated:YES completion:nil];
-
-    } else {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"No Scan Elements Present"
-                                                                                 message:@"Tap Settings to add Scan Elements"
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        
-        {
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK"
-                                                                   style: UIAlertActionStyleDefault
-                                                                 handler:^(UIAlertAction * _Nonnull action) {
-                                                                 }];
-            [alertController addAction:cancelAction];
-        }
-        
-        [[self viewController] presentViewController:alertController animated:YES completion:nil];
-    }
+    
+    NSDictionary *translation = [self.lastCommand argumentAtIndex:2];
+    PPOcrOverlayViewController *overlayVC = [[PPOcrOverlayViewController alloc] initWithOcrRecognizerType:ocrRecognizerType andTranslation:translation];
+    overlayVC.coordinator = coordinator;
+    overlayVC.delegate = self;
+    
+    UIViewController<PPScanningViewController> *scanningViewController =
+    [PPViewControllerFactory cameraViewControllerWithDelegate:nil
+                                        overlayViewController:overlayVC
+                                                  coordinator:coordinator
+                                                        error:nil];
+    scanningViewController.autorotate = YES;
+    scanningViewController.supportedOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
+    overlayVC.scanningViewController = scanningViewController;
+    [[self viewController] presentViewController:scanningViewController animated:YES completion:nil];
+    
+    
 }
 
-#pragma mark - PPFormOcrOverlayViewControllerDelegate
-
-- (void)formOcrOverlayViewControllerWillClose:(PPFormOcrOverlayViewController *)vc {
+#pragma mark - PPOcrOverlayViewControllerDelegate
+- (void)ocrOverlayViewControllerWillClose:(PPOcrOverlayViewController *)vc {
     [[self viewController] dismissViewControllerAnimated:YES completion:nil];
-
-    [self returnAsCancelled:YES];
+    
+    [self returnAsCancelled:YES withScanResult:nil];
 }
 
-- (void)formOcrOverlayViewController:(PPFormOcrOverlayViewController *)vc didFinishScanningWithElements:(NSArray *)scanElements {
-
-    [[self viewController] dismissViewControllerAnimated:YES
-                                              completion:^(void) {
-                                                  ;
-                                              }];
-
-    [self returnAsCancelled:NO];
+- (void)ocrOverlayViewControllerDidReturnResult:(NSString *)scanResult {
+    [[self viewController] dismissViewControllerAnimated:YES completion:nil];
+    
+    [self returnAsCancelled:NO withScanResult:scanResult];
 }
 
 #pragma mark - return results
 
-- (void)returnAsCancelled:(BOOL)cancelled {
+- (void)returnAsCancelled:(BOOL)cancelled withScanResult:(NSString *)scanResult {
 
     NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
     [resultDict setObject:[NSNumber numberWithInt:(cancelled ? 1 : 0)] forKey:@"cancelled"];
-
-    for (PPScanElement *element in self.scanElements) {
-        if (element.value != nil) {
-            [resultDict setObject:element.value forKey:element.identifier];
-        }
+    
+    if (scanResult.length > 0) {
+        [resultDict setObject:scanResult forKey:@"result"];
     }
 
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
@@ -168,12 +136,19 @@
     [self.commandDelegate sendPluginResult:result callbackId:self.lastCommand.callbackId];
 }
 
-- (BOOL)shouldUseVINRecognizerForTypes:(NSArray *)recognizerTypes {
-    return [recognizerTypes containsObject:@"VIN"];
-}
+#pragma mark - check scanning supported
+- (void)isScanningUnsupportedForCameraType:(CDVInvokedUrlCommand *)command {
+    NSError *error;
+    CDVPluginResult *result = nil;
+    if ([PPCameraCoordinator isScanningUnsupportedForCameraType:PPCameraTypeBack error:&error]) {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"Error: %@ Code:%ld", error.localizedDescription, (long)error.code]];
+    }
+    else {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    }
+    
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 
-- (BOOL)shouldUseLicensePlateRecognizerForTypes:(NSArray *)recognizerTypes {
-    return [recognizerTypes containsObject:@"LicensePlate"];
 }
 
 @end

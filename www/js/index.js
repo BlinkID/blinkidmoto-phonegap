@@ -51,47 +51,66 @@ var app = {
     
         resultImgDiv.style.visibility = "hidden"
 
-        /**
-         * Use these scanner types
-         * You can choose VIN or LicensePlate or both at the same time
-         * Available: "VIN", "LicensePlate"
-         */
-        var types = ["VIN", "LicensePlate"];
-
-        /**
-         * Image type defines type of the image that will be returned in scan result (image is returned as Base64 encoded JPEG)
-         * available:
-         *  "IMAGE_NONE" : do not return image in scan result
-         *  "IMAGE_SUCCESSFUL_SCAN" : return full camera frame of successful scan
-         *  "IMAGE_CROPPED" : return cropped document image (successful scan)
-         *
-         */
-        var imageType = "IMAGE_CROPPED"
 
         // Note that each platform requires its own license key
 
         // This license key allows setting overlay views for this application ID: com.microblink.blinkid
-        var licenseiOs = "FJDHBCFC-VPQMNNKV-6EKMUSTE-ZWBQKA2E-66LVGM5U-SAOG7RHA-2G2RLR55-COSW4YTN"; // valid until 2017-07-14
+        var licenseiOs = "5HGZOCUB-TYV54NRY-O53F5JTM-DV6I6N6P-URCUE5H7-Y66MDAM6-FC4NRQTN-DEIDA2LN"; // Valid until 2017-08-05
 
         // This license is only valid for package name "com.microblink.blinkid"
         var licenseAndroid = "NFRZVYWD-MCK7SSO7-TJ7ZWOC4-AT2AYDM7-JDHZQMHY-V3PZU4SX-54PGUFQM-AUX5RGYJ";
-
-        scanButton.addEventListener('click', function() {    
-            cordova.plugins.blinkIdScanner.scan(
-            
-                // Register the callback handler
-                function callback(scanningResult) {
-                    alert(JSON.stringify(scanningResult))
-                },
-                
-                // Register the error callback
-                function errorHandler(err) {
-                    alert('Error: ' + err);
-                },
-
-                types, imageType, licenseiOs, licenseAndroid
-            );
-        });
+        
+        // Translation dictionary
+        var translation = {
+            title_text: "Bitte die FIN / VIN oder Barcode in diesem Bereich erfassen",
+            cancel_text: "Abbrechen",
+            repeat_text: "Wiederholen",
+            accept_text: "Übernehmen"
+        };
+        
+        scanButton.addEventListener('click', function() {
+             cordova.plugins.blinkIdScanner.isScanningUnsupportedForCameraType(
+                                                                               // Register the callback handler
+                                                                               function callback() {
+                                                                               cordova.plugins.blinkIdScanner.scan(
+                                                                                       
+                                                                                       // Register the callback handler
+                                                                                       function callback(scanningResult) {
+                                                                                       alert(JSON.stringify(scanningResult))
+                                                                                       },
+                                                                                       
+                                                                                       // Register the error callback
+                                                                                       function errorHandler(err) {
+                                                                                       alert('Error: ' + err);
+                                                                                       },
+                                                                                       
+                                                                                       licenseiOs, licenseAndroid, translation
+                                                                                       );
+                                                                               },
+                                                                               
+                                                                               // Register the error callback - if camera is not supported, return error will be @"Error: %@ Code:%ld", error.localizedDescription, (long)error.code where error.code is 101
+                                                                               function errorHandler(err) {
+                                                                               alert(err);
+                                                                               }
+                                                                            );
+                                    });
+    
+        scanButtonLicensePlate.addEventListener('click', function() {
+                                    cordova.plugins.blinkIdScanner.scanLicensePlate(
+                                                                        
+                                                                        // Register the callback handler
+                                                                        function callback(scanningResult) {
+                                                                            alert(JSON.stringify(scanningResult))
+                                                                        },
+                                                                        
+                                                                        // Register the error callback
+                                                                        function errorHandler(err) {
+                                                                        alert('Error: ' + err);
+                                                                        },
+                                                                        
+                                                                        licenseiOs, licenseAndroid, translation
+                                                                        );
+                                    });
 
     },
     // Update DOM on a Received Event
