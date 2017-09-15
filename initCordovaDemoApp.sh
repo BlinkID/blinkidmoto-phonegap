@@ -16,8 +16,9 @@ cd BlinkMotoDemo
 # add the BlinkMoto plugin
 cordova plugin add ../BlinkMoto --variable CAMERA_USAGE_DESCRIPTION="Camera permission is required for automated scanning"
 
-# add ios support to the project
+# add android and ios support to the project
 cordova platform add ios
+cordova platform add android
 
 # copy content of the www folder
 cp  -f -r ../www .
@@ -27,3 +28,4 @@ cordova build
 
 # how to run
 echo "To run iOS demo application open Xcode project BlinkMotoDemo.xcodeproj"
+echo "To run Android demo application, position to BlinkMotoDemo folder and type: cordova run android"
