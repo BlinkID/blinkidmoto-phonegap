@@ -159,7 +159,7 @@ public class BlinkIdScanner extends CordovaPlugin {
                 String resultString = data.getStringExtra(ScanActivity.EXTRAS_RESULT_STRING);
                 try {
                     JSONObject root = new JSONObject();
-                    root.put(RES_KEY_CANCELLED, false);
+                    root.put(RES_KEY_CANCELLED, 0);
                     root.put(RES_KEY_RESULT, resultString);
                     this.callbackContext.success(root);
                 } catch (JSONException e) {
@@ -168,7 +168,7 @@ public class BlinkIdScanner extends CordovaPlugin {
             } else if (resultCode == ScanCard.RESULT_CANCELED) {
                 JSONObject obj = new JSONObject();
                 try {
-                    obj.put(RES_KEY_CANCELLED, true);
+                    obj.put(RES_KEY_CANCELLED, 1);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "This should never happen");
                 }
