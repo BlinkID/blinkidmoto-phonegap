@@ -17,15 +17,6 @@
  * under the License.
  */
 
-// implement your decoding as you need it, this just does ASCII decoding
-function hex2a(hex) {
-    var str = '';
-    for (var i = 0; i < hex.length; i += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-    }
-    return str;
-}
-
 var app = {
     // Application Constructor
     initialize: function() {
@@ -69,48 +60,38 @@ var app = {
         };
         
         scanButton.addEventListener('click', function() {
-             cordova.plugins.blinkIdScanner.isScanningUnsupportedForCameraType(
-                                                                               // Register the callback handler
-                                                                               function callback() {
-                                                                               cordova.plugins.blinkIdScanner.scan(
-                                                                                       
-                                                                                       // Register the callback handler
-                                                                                       function callback(scanningResult) {
-                                                                                       alert(JSON.stringify(scanningResult))
-                                                                                       },
-                                                                                       
-                                                                                       // Register the error callback
-                                                                                       function errorHandler(err) {
-                                                                                       alert('Error: ' + err);
-                                                                                       },
-                                                                                       
-                                                                                       licenseiOs, licenseAndroid, translation
-                                                                                       );
-                                                                               },
-                                                                               
-                                                                               // Register the error callback - if camera is not supported, return error will be @"Error: %@ Code:%ld", error.localizedDescription, (long)error.code where error.code is 101
-                                                                               function errorHandler(err) {
-                                                                               alert(err);
-                                                                               }
-                                                                            );
-                                    });
+            cordova.plugins.blinkIdScanner.scan(
+
+                // Register the callback handler
+                function callback(scanningResult) {
+                alert(JSON.stringify(scanningResult))
+                },
+                
+                // Register the error callback
+                function errorHandler(err) {
+                alert('Error: ' + err);
+                },
+                
+                licenseiOs, licenseAndroid, translation
+            );
+        });
     
         scanButtonLicensePlate.addEventListener('click', function() {
-                                    cordova.plugins.blinkIdScanner.scanLicensePlate(
-                                                                        
-                                                                        // Register the callback handler
-                                                                        function callback(scanningResult) {
-                                                                            alert(JSON.stringify(scanningResult))
-                                                                        },
-                                                                        
-                                                                        // Register the error callback
-                                                                        function errorHandler(err) {
-                                                                        alert('Error: ' + err);
-                                                                        },
-                                                                        
-                                                                        licenseiOs, licenseAndroid, translation
-                                                                        );
-                                    });
+            cordova.plugins.blinkIdScanner.scanLicensePlate(
+
+                // Register the callback handler
+                function callback(scanningResult) {
+                    alert(JSON.stringify(scanningResult))
+                },
+                
+                // Register the error callback
+                function errorHandler(err) {
+                alert('Error: ' + err);
+                },
+                
+                licenseiOs, licenseAndroid, translation
+            );
+        });
 
     },
     // Update DOM on a Received Event
