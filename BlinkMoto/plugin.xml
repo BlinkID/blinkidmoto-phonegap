@@ -18,7 +18,47 @@
     <js-module src="www/blinkIdScanner.js" name="BlinkIdScanner">
         <clobbers target="cordova.plugins.blinkIdScanner" />
     </js-module>
-    
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="BlinkIdScanner">
+                <param name="android-package" value="com.phonegap.plugins.blinkid.BlinkIdScanner" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CAMERA" />
+
+            <uses-feature android:name="android.hardware.camera" />
+            <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+            <supports-screens
+                android:anyDensity="true"
+                android:largeScreens="true"
+                android:normalScreens="true"
+                android:resizeable="true"
+                android:smallScreens="true" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity
+                    android:name="com.phonegap.plugins.blinkid.ScanActivity"
+                    android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                    android:configChanges="orientation|screenSize"
+                    android:screenOrientation="portrait" >
+            </activity>
+        </config-file>
+
+        <source-file src="src/android/java/com/phonegap/plugins/blinkid/BlinkIdScanner.java" target-dir="src/com/phonegap/plugins/blinkid" />
+        <source-file src="src/android/java/com/phonegap/plugins/blinkid/ScanActivity.java" target-dir="src/com/phonegap/plugins/blinkid" />
+        <!--source-file src="src/android/java/com/phonegap/plugins/blinkid/FakeR.java" target-dir="src/com/phonegap/plugins/blinkid" /-->
+
+        <framework src="src/android/blinkid-android/libBlinkID.gradle" custom="true" type="gradleReference" />
+        <resource-file src="src/android/blinkid-android/LibBlinkID.aar" target="aar/LibBlinkID.aar" />
+
+        <hook type="after_prepare" src="scripts/fix-largeheap.js" />
+    </platform>
+
     <hook type="after_platform_add" src="addEmbedded.js" />
 
     <platform name="ios">
