@@ -49,7 +49,7 @@ var app = {
         var licenseiOs = "5HGZOCUB-TYV54NRY-O53F5JTM-DV6I6N6P-URCUE5H7-Y66MDAM6-FC4NRQTN-DEIDA2LN"; // Valid until 2017-08-05
 
         // This license is only valid for package name "com.microblink.blinkid"
-        var licenseAndroid = "NFRZVYWD-MCK7SSO7-TJ7ZWOC4-AT2AYDM7-JDHZQMHY-V3PZU4SX-54PGUFQM-AUX5RGYJ";
+        var licenseAndroid = "PDSEMRTP-ACSCUVIA-UBIBQNDG-D7CPIENL-WHW2TLUQ-T6G73F3U-GEM3F7HQ-MVGDHQLY";
         
         // Translation dictionary
         var translation = {
