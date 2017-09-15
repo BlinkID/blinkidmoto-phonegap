@@ -52,6 +52,17 @@
         <source-file src="src/android/java/com/phonegap/plugins/blinkid/BlinkIdScanner.java" target-dir="src/com/phonegap/plugins/blinkid" />
         <source-file src="src/android/java/com/phonegap/plugins/blinkid/ScanActivity.java" target-dir="src/com/phonegap/plugins/blinkid" />
         <!--source-file src="src/android/java/com/phonegap/plugins/blinkid/FakeR.java" target-dir="src/com/phonegap/plugins/blinkid" /-->
+        
+        <resource-file src="src/android/res/drawable/button_accent_text_color.xml" target="res/drawable/button_accent_text_color.xml" />
+        <resource-file src="src/android/res/drawable/button_accent.xml" target="res/drawable/button_accent.xml" />
+        <resource-file src="src/android/res/drawable/button_normal.xml" target="res/drawable/button_normal.xml" />
+        <resource-file src="src/android/res/drawable/scan_frame.xml" target="res/drawable/scan_frame.xml" />
+        
+        <resource-file src="src/android/res/layout/custom_scan_layout.xml" target="res/layout/custom_scan_layout.xml" />
+        <resource-file src="src/android/res/layout/custom_scan_overlay.xml" target="res/layout/custom_scan_overlay.xml" />
+        
+        <resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
+        <resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml" />
 
         <framework src="src/android/blinkid-android/libBlinkID.gradle" custom="true" type="gradleReference" />
         <resource-file src="src/android/blinkid-android/LibBlinkID.aar" target="aar/LibBlinkID.aar" />
