@@ -12,7 +12,7 @@
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
-        <engine name="cordova-android" version=">=4.0.0" />
+        <engine name="cordova-android" version=">=5.0.0" />
     </engines>   
 
     <js-module src="www/blinkIdScanner.js" name="BlinkIdScanner">
@@ -62,6 +62,7 @@
         <resource-file src="src/android/res/layout/custom_scan_overlay.xml" target="res/layout/custom_scan_overlay.xml" />
         
         <resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
+        <resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml" />
         <resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml" />
 
         <framework src="src/android/blinkid-android/libBlinkID.gradle" custom="true" type="gradleReference" />

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="scan_shade">#a0000000</color>
+    <color name="scan_frame_border_color">#fff</color>
+
+    <color name="btn_background">#aaaaaa</color>
+    <color name="btn_background_accent">#10a3c1</color>
+    <color name="btn_accent_text_color">#fff</color>
+    <color name="btn_accent_text_color_disabled">#555</color>
 </resources>
