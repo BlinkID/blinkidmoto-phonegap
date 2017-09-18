@@ -15,7 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".42"
+            android:layout_weight="42"
 
             android:background="@color/scan_shade"
             android:gravity="bottom"
@@ -36,20 +36,20 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".16"
+            android:layout_weight="16"
             android:orientation="horizontal">
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".06"
+                android:layout_weight="6"
                 android:background="@color/scan_shade" />
 
             <FrameLayout
                 android:id="@+id/fl_scan_frame"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".88"
+                android:layout_weight="88"
                 android:background="@drawable/scan_frame"
                 android:padding="1dp">
 
@@ -66,7 +66,7 @@
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".06"
+                android:layout_weight="6"
                 android:background="@color/scan_shade" />
 
         </LinearLayout>
@@ -74,7 +74,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".42"
+            android:layout_weight="42"
 
             android:background="@color/scan_shade"
             android:padding="16dp">
