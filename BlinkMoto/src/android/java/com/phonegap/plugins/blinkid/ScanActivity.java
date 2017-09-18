@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -26,6 +27,7 @@ import com.microblink.detectors.points.PointsDetectorResult;
 import com.microblink.geometry.Rectangle;
 import com.microblink.hardware.camera.CameraType;
 import com.microblink.hardware.orientation.Orientation;
+import com.microblink.hardware.orientation.OrientationChangeListener;
 import com.microblink.image.Image;
 import com.microblink.metadata.DetectionMetadata;
 import com.microblink.metadata.ImageMetadata;
@@ -51,6 +53,7 @@ import com.microblink.view.BaseCameraView;
 import com.microblink.view.CameraAspectMode;
 import com.microblink.view.CameraEventsListener;
 import com.microblink.view.NonLandscapeOrientationNotSupportedException;
+import com.microblink.view.OnSizeChangedListener;
 import com.microblink.view.OrientationAllowedListener;
 import com.microblink.view.ocrResult.IOcrResultView;
 import com.microblink.view.ocrResult.OcrResultHorizontalDotsView;
@@ -68,6 +71,8 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     public static final String EXTRAS_RESULT_STRING = "key_result_string";
 
+    private static final float SCANNING_REGION_ASPECT_RATIO = 1 / 4f;
+
     public static enum RecognizerType {
         VIN, LICENCE_PLATES
     }
@@ -79,6 +84,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     private PointSetView mPointSetView;
     private IOcrResultView mOcrDotsView;
 
+    private FrameLayout mScanContainer;
     private TextView mScanTitleView;
     private TextView mScanResultStringView;
     private ImageView mScanResultImageView;
@@ -96,6 +102,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     }
 
     private ActivityState mActivityState = ActivityState.DESTROYED;
+    private boolean rotationRefreshAllowed = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -124,25 +131,25 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
         mRecognizerView = (RecognizerView) findViewById(R.id.recognizerView);
 
+        // Set license key.
         try {
-            // Set license key.
-            mRecognizerView.setLicenseKey(extras.getString(EXTRAS_LICENSE_KEY));
-        } catch (InvalidLicenceKeyException exc) {
-            finish();
-            return;
+            mRecognizerView.setLicenseKey(extras.getString(EXTRAS_LICENSE_KEY, null));
+        } catch (InvalidLicenceKeyException e) {
+            e.printStackTrace();
         }
+
 
         // Add the camera permissions overlay.
         mCameraPermManager = new CameraPermissionManager(this);
-        FrameLayout root = (FrameLayout) findViewById(R.id.recognozerViewRoot);
-        View cameraPermissionView;
-        if ((cameraPermissionView = mCameraPermManager.getAskPermissionOverlay()) != null) {
+        final FrameLayout root = (FrameLayout) findViewById(R.id.recognozerViewRoot);
+        View cameraPermissionView = mCameraPermManager.getAskPermissionOverlay();
+        if (cameraPermissionView != null) {
             root.addView(cameraPermissionView);
         }
 
         // Setup array of recognition settings.
         RecognitionSettings settings = new RecognitionSettings();
-        if(extras.getSerializable(EXTRAS_RECOGNIZER_TYPE) == null) {
+        if (extras.getSerializable(EXTRAS_RECOGNIZER_TYPE) == null) {
             throw new NullPointerException("Recognizer type extra missing.");
         }
         RecognizerSettings[] settArray = setupSettingsArray((RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE));
@@ -160,13 +167,27 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mRecognizerView.setCameraEventsListener(this);
         // Set camera aspect mode
         mRecognizerView.setAspectMode(CameraAspectMode.ASPECT_FILL);
-        // Set the recognizer view scanning region.
-        mRecognizerView.setScanningRegion(new Rectangle(.06f, .42f, .88f, .16f), true);
         // Allow all orientations.
         mRecognizerView.setOrientationAllowedListener(new OrientationAllowedListener() {
             @Override
             public boolean isOrientationAllowed(Orientation orientation) {
                 return true;
+            }
+        });
+        mRecognizerView.setOrientationChangeListener(new OrientationChangeListener() {
+            @Override
+            public void onOrientationChange(Orientation orientation) {
+                if (rotationRefreshAllowed) {
+                    resizeScanningRegion(orientation);
+                }
+            }
+        });
+        mRecognizerView.setOnSizeChangedListener(new OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(int i, int i1) {
+                if (rotationRefreshAllowed) {
+                    resizeScanningRegion(mRecognizerView.getCurrentOrientation());
+                }
             }
         });
 //        mRecognizerView.setAnimateRotation(true);
@@ -194,6 +215,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         // Inflate the overlay view.
         final ViewGroup overlay = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_scan_overlay, null);
         // Bind view elements.
+        mScanContainer = (FrameLayout) overlay.findViewById(R.id.fl_scan_frame);
         mScanTitleView = (TextView) overlay.findViewById(R.id.tv_scan_title);
         mScanResultStringView = (TextView) overlay.findViewById(R.id.tv_scan_result);
         mScanResultImageView = (ImageView) overlay.findViewById(R.id.iv_scan_result);
@@ -201,10 +223,10 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mCancelButton = (Button) overlay.findViewById(R.id.btn_cancel);
         mRepeatButton = (Button) overlay.findViewById(R.id.btn_repeat);
         // Set user defined titles.
-        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, "Position the data here"));
-        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, "Accept"));
-        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, "Cancel"));
-        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, "Repeat"));
+        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, getString(R.string.scanning_title)));
+        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, getString(R.string.accept)));
+        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, getString(R.string.cancel)));
+        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, getString(R.string.repeat)));
         // Result image invisible at start.
         mScanResultImageView.setVisibility(View.INVISIBLE);
         // Cannot accept or retry when scanning is in progress.
@@ -212,6 +234,51 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mAcceptButton.setEnabled(false);
         // Add the overlay to the recognizer view.
         mRecognizerView.addChildView(overlay, true);
+
+        root.post(new Runnable() {
+            @Override
+            public void run() {
+                resizeScanningRegion(mRecognizerView.getCurrentOrientation());
+                rotationRefreshAllowed = true;
+            }
+        });
+    }
+
+    private void resizeScanningRegion(Orientation orientation) {
+        // Determine the sizes based on orientation
+        int width;
+        int screenWidth;
+        int screenHeight;
+        if (orientation.isVertical()) {
+            width = mRecognizerView.getWidth();
+            screenWidth = mRecognizerView.getWidth();
+            screenHeight = mRecognizerView.getHeight();
+        } else {
+            width = mRecognizerView.getHeight();
+            screenWidth = mRecognizerView.getHeight();
+            screenHeight = mRecognizerView.getWidth();
+        }
+
+        // Subtract the relative horizontal padding
+        int horizontalPadding = (int) getResources().getDimension(R.dimen.scan_region_padding);
+        width -= horizontalPadding * 2;
+
+        // Calculate the height based on given aspect ratio
+        int height = Math.round(width * SCANNING_REGION_ASPECT_RATIO);
+
+        // Set the scanning region container size
+        ViewGroup.LayoutParams params = mScanContainer.getLayoutParams();
+        params.width = width;
+        params.height = height;
+        mScanContainer.setLayoutParams(params);
+
+        // Set the recognizer view scanning region (must use relative coordinates)
+        mRecognizerView.setScanningRegion(new Rectangle(
+                horizontalPadding / (float) screenWidth,
+                (screenHeight / 2f - height / 2f) / screenHeight,
+                width / (float) screenWidth,
+                height / (float) screenHeight
+        ), true);
     }
 
     private RecognizerSettings[] setupSettingsArray(RecognizerType type) {
@@ -248,6 +315,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                     mOcrDotsView.setOcrResult(null);
                 }
             }
+
         } else if (metadata instanceof OcrMetadata) {
             if (mPointSetView != null) {
                 mPointSetView.setPointsDetectionResult(null);
@@ -255,6 +323,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             if (mOcrDotsView != null) {
                 mOcrDotsView.setOcrResult(((OcrMetadata) metadata).getOcrResult());
             }
+
         } else if (metadata instanceof ImageMetadata) {
             Image image = ((ImageMetadata) metadata).getImage();
             if (image != null) {
@@ -288,7 +357,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             mRecognizerView.resume();
 
             // Not displaying results, continue scanning.
-            if (mScanResultStringView == null) {
+            if (mScanResultStringView.getVisibility() != View.VISIBLE) {
                 mRecognizerView.resumeScanning(false);
             }
         }
@@ -322,6 +391,14 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         if (mRecognizerView != null) {
             mRecognizerView.destroy();
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mRecognizerView.changeConfiguration(newConfig);
+        resizeScanningRegion(mRecognizerView.getCurrentOrientation());
     }
 
     public void onButtonClicked(View view) {
@@ -395,7 +472,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                         mScanResultImageView.setImageBitmap(bitmap);
                     }
 
-                    String resultString = "Unknown result";
+                    String resultString = getString(R.string.unknown_result);
 
                     if (result instanceof VinScanResult) {
                         resultString = ((VinScanResult) result).getVin();
@@ -408,7 +485,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                                 resultString = parsedAmount;
                             }
                         } else {
-                            resultString = "Invalid result, please try again.";
+                            resultString = getString(R.string.invalid_result_message);
                         }
                     }
 
@@ -422,7 +499,6 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     @Override
     public void onCameraPreviewStarted() {
-
     }
 
     @Override
@@ -435,9 +511,9 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         if (mActivityState == ActivityState.RESUMED || mActivityState == ActivityState.STARTED) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             ab.setCancelable(false)
-                    .setTitle("Error")
+                    .setTitle(R.string.error_dialog_title)
                     .setMessage(throwable.getClass().getSimpleName() + ": " + throwable.getMessage())
-                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    .setNeutralButton(R.string.error_dialog_ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (dialog != null) dialog.dismiss();
