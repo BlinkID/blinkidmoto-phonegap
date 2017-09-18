@@ -45,7 +45,7 @@ public class BlinkIdScanner extends CordovaPlugin {
 
     private static final String LOG_TAG = "BlinkIdScanner";
 
-    private CallbackContext callbackContext;
+    private CallbackContext mCallbackContext;
 
     /**
      * Constructor.
@@ -76,7 +76,7 @@ public class BlinkIdScanner extends CordovaPlugin {
      */
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
-        this.callbackContext = callbackContext;
+        mCallbackContext = callbackContext;
 
         ScanActivity.RecognizerType recognizerType;
         if (action.equals(SCAN)) {
@@ -161,7 +161,9 @@ public class BlinkIdScanner extends CordovaPlugin {
                     JSONObject root = new JSONObject();
                     root.put(RES_KEY_CANCELLED, 0);
                     root.put(RES_KEY_RESULT, resultString);
-                    this.callbackContext.success(root);
+                    if (mCallbackContext != null) {
+                        mCallbackContext.success(root);
+                    }
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "This should never happen");
                 }
@@ -172,9 +174,13 @@ public class BlinkIdScanner extends CordovaPlugin {
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "This should never happen");
                 }
-                this.callbackContext.success(obj);
+                if (mCallbackContext != null) {
+                    mCallbackContext.success(obj);
+                }
             } else {
-                this.callbackContext.error("Unexpected error");
+                if (mCallbackContext != null) {
+                    mCallbackContext.error("Unexpected error");
+                }
             }
         }
     }
