@@ -198,13 +198,6 @@ public class BlinkIdScanner extends CordovaPlugin {
         private String mRepeatText;
         private String mAcceptText;
 
-        private TranslationSettings() {
-            mTitleText = "";
-            mCancelText = "";
-            mRepeatText = "";
-            mAcceptText = "";
-        }
-
         /**
          * Reads translations from JSONObject. If some translation does not exist, sets its value to
          * empty string.
@@ -213,16 +206,16 @@ public class BlinkIdScanner extends CordovaPlugin {
          */
         public static TranslationSettings readFromJSON(JSONObject translationJson) {
             TranslationSettings translationSett = new TranslationSettings();
-            translationSett.mTitleText = translationJson.optString(JSON_KEY_TITLE_TEXT);
-            translationSett.mCancelText = translationJson.optString(JSON_KEY_CANCEL_TEXT);
-            translationSett.mRepeatText = translationJson.optString(JSON_KEY_REPEAT_TEXT);
-            translationSett.mAcceptText = translationJson.optString(JSON_KEY_ACCEPT_TEXT);
+            translationSett.mTitleText = translationJson.optString(JSON_KEY_TITLE_TEXT, null);
+            translationSett.mCancelText = translationJson.optString(JSON_KEY_CANCEL_TEXT, null);
+            translationSett.mRepeatText = translationJson.optString(JSON_KEY_REPEAT_TEXT, null);
+            translationSett.mAcceptText = translationJson.optString(JSON_KEY_ACCEPT_TEXT, null);
             return translationSett;
         }
 
         /**
          * Returns text for the title.
-         * @return text for the title.
+         * @return text for the title or {@code null} if it does not exist.
          */
         public String getTitleText() {
             return mTitleText;
@@ -230,7 +223,7 @@ public class BlinkIdScanner extends CordovaPlugin {
 
         /**
          * Returns cancel button text.
-         * @return cancel button text.
+         * @return cancel button text or {@code null} if it does not exist.
          */
         public String getCancelText() {
             return mCancelText;
@@ -238,7 +231,7 @@ public class BlinkIdScanner extends CordovaPlugin {
 
         /**
          * Returns repeat button text.
-         * @return repeat button text.
+         * @return repeat button text or {@code null} if it does not exist.
          */
         public String getRepeatText() {
             return mRepeatText;
@@ -246,7 +239,7 @@ public class BlinkIdScanner extends CordovaPlugin {
 
         /**
          * Returns accept button text.
-         * @return accept button text.
+         * @return accept button text or {@code null} if it does not exist.
          */
         public String getAcceptText() {
             return mAcceptText;
