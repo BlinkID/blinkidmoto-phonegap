@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BlinkMotoDemo</string>
+    <string name="launcher_name">@string/app_name</string>
+    <string name="activity_name">@string/launcher_name</string>
+    <string name="scanning_result_holder_desc">Scanning result holder</string>
+
+    <string name="scanning_title">Position the data here</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="repeat">Repeat</string>
+
+    <string name="unknown_result">Unknown result</string>
+    <string name="invalid_result_message">Invalid result, please try again.</string>
+
+    <string name="error_dialog_title">Error</string>
+    <string name="error_dialog_ok">OK</string>
+</resources>

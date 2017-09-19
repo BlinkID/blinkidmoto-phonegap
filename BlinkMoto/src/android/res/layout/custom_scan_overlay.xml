@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:background="#cef">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_scan_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/horizontal_container"
+
+            android:layout_alignParentTop="true"
+            android:background="@color/scan_shade"
+
+            android:padding="6dp"
+            android:gravity="center_horizontal|bottom"
+            android:textColor="#fff"
+            android:textSize="@dimen/scan_title_text_size"
+            tools:text="Bitte die FIN / VIN oder Barcode in diesem Bereich erfassen" />
+
+        <LinearLayout
+            android:id="@+id/horizontal_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="@dimen/scan_region_padding"
+                android:layout_height="match_parent"
+                android:background="@color/scan_shade" />
+
+            <FrameLayout
+                android:id="@+id/fl_scan_frame"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="1dp"
+
+                android:background="@drawable/scan_frame"
+                tools:layout_height="66dp">
+
+                <ImageView
+                    android:id="@+id/iv_scan_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:contentDescription="@string/scanning_result_holder_desc"
+                    android:scaleType="fitXY"
+                    android:visibility="gone"/>
+            </FrameLayout>
+
+            <View
+                android:layout_width="@dimen/scan_region_padding"
+                android:layout_height="match_parent"
+                android:background="@color/scan_shade" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/result_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/horizontal_container"
+
+            android:background="@color/scan_shade"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tv_scan_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_alignParentTop="true"
+
+                android:gravity="center"
+                android:textColor="#fff"
+                android:textSize="20sp"
+                tools:text="THW 80832" />
+
+            <Button
+                android:id="@+id/btn_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/btn_height"
+                android:layout_alignParentBottom="true"
+
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/button_accent"
+
+                android:onClick="onButtonClicked"
+
+                android:padding="@dimen/btn_padding"
+                android:textColor="@drawable/button_accent_text_color"
+                android:textSize="@dimen/btn_text_size"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textAllCaps="false"
+
+                tools:text="Übernehmen" />
+
+            <Button
+                android:id="@+id/btn_repeat"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/btn_height"
+                android:layout_alignParentBottom="true"
+
+                android:layout_marginEnd="@dimen/btn_separation"
+                android:layout_marginRight="@dimen/btn_separation"
+                android:layout_toLeftOf="@+id/btn_accept"
+                android:layout_toStartOf="@+id/btn_accept"
+                android:background="@drawable/button_normal"
+
+                android:onClick="onButtonClicked"
+
+                android:padding="@dimen/btn_padding"
+                android:textSize="@dimen/btn_text_size"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textAllCaps="false"
+
+                tools:text="Wiederholen" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/btn_height"
+                android:layout_alignParentBottom="true"
+
+                android:layout_marginEnd="@dimen/btn_separation"
+                android:layout_marginRight="@dimen/btn_separation"
+                android:layout_toLeftOf="@+id/btn_repeat"
+                android:layout_toStartOf="@+id/btn_repeat"
+                android:background="@drawable/button_normal"
+
+                android:onClick="onButtonClicked"
+
+                android:padding="@dimen/btn_padding"
+                android:textSize="@dimen/btn_text_size"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textAllCaps="false"
+
+                tools:text="Abbrechen" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>
