@@ -14,7 +14,7 @@
             android:id="@+id/tv_scan_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/fl_scan_frame"
+            android:layout_above="@+id/horizontal_container"
 
             android:layout_alignParentTop="true"
             android:background="@color/scan_shade"
@@ -22,47 +22,46 @@
             android:padding="6dp"
             android:gravity="center_horizontal|bottom"
             android:textColor="#fff"
-            android:textSize="16sp"
+            android:textSize="@dimen/scan_title_text_size"
             tools:text="Bitte die FIN / VIN oder Barcode in diesem Bereich erfassen" />
 
-        <View
-            android:layout_width="16dp"
+        <LinearLayout
+            android:id="@+id/horizontal_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/result_container"
-
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/tv_scan_title"
-            android:layout_toLeftOf="@+id/fl_scan_frame"
-            android:background="@color/scan_shade" />
-
-        <FrameLayout
-            android:id="@+id/fl_scan_frame"
-            android:layout_width="320dp"
-            android:layout_height="66dp"
-
             android:layout_centerInParent="true"
-            android:background="@drawable/scan_frame"
-            android:padding="1dp">
+            android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/iv_scan_result"
-                android:layout_width="match_parent"
+            <View
+                android:layout_width="@dimen/scan_region_padding"
                 android:layout_height="match_parent"
+                android:background="@color/scan_shade" />
 
-                android:contentDescription="@string/scanning_result_holder_desc"
-                android:scaleType="fitXY"
-                android:visibility="invisible" />
-        </FrameLayout>
+            <FrameLayout
+                android:id="@+id/fl_scan_frame"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="1dp"
 
-        <View
-            android:layout_width="16dp"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/result_container"
+                android:background="@drawable/scan_frame"
+                tools:layout_height="66dp">
 
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/tv_scan_title"
-            android:layout_toRightOf="@+id/fl_scan_frame"
-            android:background="@color/scan_shade" />
+                <ImageView
+                    android:id="@+id/iv_scan_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:contentDescription="@string/scanning_result_holder_desc"
+                    android:scaleType="fitXY"
+                    android:visibility="gone"/>
+            </FrameLayout>
+
+            <View
+                android:layout_width="@dimen/scan_region_padding"
+                android:layout_height="match_parent"
+                android:background="@color/scan_shade" />
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/result_container"
@@ -70,7 +69,7 @@
             android:layout_height="wrap_content"
 
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/fl_scan_frame"
+            android:layout_below="@id/horizontal_container"
 
             android:background="@color/scan_shade"
             android:padding="12dp">

@@ -6,4 +6,5 @@
     <dimen name="btn_separation">8dp</dimen>
     <dimen name="btn_padding">10dp</dimen>
     <dimen name="btn_text_size">12sp</dimen>
+    <dimen name="scan_title_text_size">16sp</dimen>
 </resources>

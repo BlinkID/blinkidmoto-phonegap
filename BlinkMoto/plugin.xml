@@ -45,7 +45,8 @@
                     android:name="com.phonegap.plugins.blinkid.ScanActivity"
                     android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                     android:configChanges="orientation|screenSize"
-                    android:screenOrientation="portrait" >
+                    android:screenOrientation="portrait"
+                    android:resizeableActivity="false" >
             </activity>
         </config-file>
 
