@@ -1,6 +1,6 @@
 ## Sample
 
-Here's a complete example of how to create and build a project iOS using cordova (you can substitute equivalent commands for phonegap):
+Here's a complete example of how to create and build a project using cordova (you can substitute equivalent commands for phonegap):
 
 
 ```
