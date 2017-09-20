@@ -60,7 +60,6 @@ import com.microblink.view.OnActivityFlipListener;
 import com.microblink.view.OrientationAllowedListener;
 import com.microblink.view.ocrResult.IOcrResultView;
 import com.microblink.view.ocrResult.OcrResultDotsView;
-import com.microblink.view.ocrResult.OcrResultHorizontalDotsView;
 import com.microblink.view.recognition.RecognizerView;
 import com.microblink.view.recognition.ScanResultListener;
 import com.microblink.view.viewfinder.PointSetView;
@@ -280,10 +279,6 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                 mScanViewfinder.setLayoutParams(params);
                 mScanViewfinder.invalidate();
 
-                boolean scanningRegionRotatable = true;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N && isInMultiWindowMode()) {
-                    scanningRegionRotatable = false;
-                }
                 if (cameraWidth != 0 && cameraHeight != 0) {
                     // Set the recognizer view scanning region (must use relative coordinates)
                     float x = horizontalPadding / (float) cameraWidth;
@@ -291,7 +286,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                     float w = width / (float) cameraWidth;
                     float h = height / (float) cameraHeight;
                     Log.i(this, "Scanning region updated x:{}, y:{}, w:{}, h:{}", x, y, w, h);
-                    mRecognizerView.setScanningRegion(new Rectangle(x, y, w, h), scanningRegionRotatable);
+                    mRecognizerView.setScanningRegion(new Rectangle(x, y, w, h), false);
                 } else {
                     Log.e(this, "Camera width or camera height is 0 w:{}, h:{}", cameraWidth, cameraHeight);
                 }
@@ -528,6 +523,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     @Override
     public void onCameraPreviewStarted() {
+        resizeScanningRegion();
     }
 
     @Override
