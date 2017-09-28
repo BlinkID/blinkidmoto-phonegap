@@ -62,9 +62,9 @@
         <resource-file src="src/android/res/layout/custom_scan_layout.xml" target="res/layout/custom_scan_layout.xml" />
         <resource-file src="src/android/res/layout/custom_scan_overlay.xml" target="res/layout/custom_scan_overlay.xml" />
         
-        <resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
-        <resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml" />
-        <resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml" />
+        <resource-file src="src/android/res/values/colors.xml" target="res/values/blinkid-colors.xml" />
+        <resource-file src="src/android/res/values/dimens.xml" target="res/values/blinkid-dimens.xml" />
+        <resource-file src="src/android/res/values/strings.xml" target="res/values/blinkid-strings.xml" />
 
         <framework src="src/android/blinkid-android/libBlinkID.gradle" custom="true" type="gradleReference" />
         <resource-file src="src/android/blinkid-android/LibBlinkID.aar" target="aar/LibBlinkID.aar" />
