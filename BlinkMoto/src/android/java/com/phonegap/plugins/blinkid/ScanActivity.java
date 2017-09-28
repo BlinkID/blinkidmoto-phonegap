@@ -22,7 +22,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.microblink.blinkmoto.R;
 import com.microblink.detectors.DetectorResult;
 import com.microblink.detectors.points.PointsDetectorResult;
 import com.microblink.geometry.Rectangle;
@@ -82,6 +81,8 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     private final String OCR_PARSER_NAME = "parser";
 
+    private FakeR mFakeR;
+
     private CameraPermissionManager mCameraPermManager;
     private RecognizerView mRecognizerView;
     private PointSetView mPointSetView;
@@ -109,9 +110,10 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        mFakeR = new FakeR(this);
         super.onCreate(savedInstanceState);
         try {
-            setContentView(R.layout.custom_scan_layout);
+            setContentView(mFakeR.getIdFrom("layout", "custom_scan_layout"));
         } catch (InflateException ie) {
             Throwable cause = ie.getCause();
             while (cause.getCause() != null) {
@@ -131,7 +133,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         // Set internationalized strings.
         Bundle extras = getIntent().getExtras();
 
-        mRecognizerView = (RecognizerView) findViewById(R.id.recognizerView);
+        mRecognizerView = (RecognizerView) findViewById(mFakeR.getId("recognizerView"));
 
         // Set license key.
         String licenseKey = extras.getString(EXTRAS_LICENSE_KEY);
@@ -143,7 +145,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
         // Add the camera permissions overlay.
         mCameraPermManager = new CameraPermissionManager(this);
-        mRecognizerViewRoot = (FrameLayout) findViewById(R.id.recognozerViewRoot);
+        mRecognizerViewRoot = (FrameLayout) findViewById(mFakeR.getId("recognizerViewRoot"));
         View cameraPermissionView = mCameraPermManager.getAskPermissionOverlay();
         if (cameraPermissionView != null) {
             mRecognizerViewRoot.addView(cameraPermissionView);
@@ -211,20 +213,20 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mRecognizerView.addChildView(mOcrResultView.getView(), false);
 
         // Inflate the overlay view.
-        final ViewGroup overlay = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_scan_overlay, null);
+        final ViewGroup overlay = (ViewGroup) getLayoutInflater().inflate(mFakeR.getIdFrom("layout", "custom_scan_overlay"), null);
         // Bind view elements.
-        mScanViewfinder = (FrameLayout) overlay.findViewById(R.id.fl_scan_frame);
-        mScanTitleView = (TextView) overlay.findViewById(R.id.tv_scan_title);
-        mScanResultStringView = (TextView) overlay.findViewById(R.id.tv_scan_result);
-        mScanResultImageView = (ImageView) overlay.findViewById(R.id.iv_scan_result);
-        mAcceptButton = (Button) overlay.findViewById(R.id.btn_accept);
-        mCancelButton = (Button) overlay.findViewById(R.id.btn_cancel);
-        mRepeatButton = (Button) overlay.findViewById(R.id.btn_repeat);
+        mScanViewfinder = (FrameLayout) overlay.findViewById(mFakeR.getId("fl_scan_frame"));
+        mScanTitleView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_title"));
+        mScanResultStringView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_result"));
+        mScanResultImageView = (ImageView) overlay.findViewById(mFakeR.getId("iv_scan_result"));
+        mAcceptButton = (Button) overlay.findViewById(mFakeR.getId("btn_accept"));
+        mCancelButton = (Button) overlay.findViewById(mFakeR.getId("btn_cancel"));
+        mRepeatButton = (Button) overlay.findViewById(mFakeR.getId("btn_repeat"));
         // Set user defined titles.
-        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, getString(R.string.blinkid_scanning_title)));
-        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, getString(R.string.blinkid_accept)));
-        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, getString(R.string.blinkid_cancel)));
-        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, getString(R.string.blinkid_repeat)));
+        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, mFakeR.getString("blinkid_scanning_title")));
+        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, mFakeR.getString("blinkid_accept")));
+        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, mFakeR.getString("blinkid_cancel")));
+        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, mFakeR.getString("blinkid_repeat")));
         // Result image invisible at start.
         mScanResultImageView.setVisibility(View.GONE);
         // Cannot accept or retry when scanning is in progress.
@@ -267,7 +269,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                 }
 
                 // Subtract the relative horizontal padding
-                int horizontalPadding = (int) getResources().getDimension(R.dimen.blinkid_scan_region_padding);
+                int horizontalPadding = (int) getResources().getDimension(mFakeR.getIdFrom("dimen", "blinkid_scan_region_padding"));
                 width -= horizontalPadding * 2;
 
                 // Calculate the height based on given aspect ratio
@@ -426,29 +428,27 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     }
 
     public void onButtonClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btn_accept:
-                Intent intent = new Intent();
-                intent.putExtra(EXTRAS_RESULT_STRING, mScanResultStringView.getText().toString());
-                setResult(RESULT_OK, intent);
-                finish();
-                break;
+        int id = view.getId();
+        if (id == mFakeR.getId("btn_accept")) {
+            Intent intent = new Intent();
+            intent.putExtra(EXTRAS_RESULT_STRING, mScanResultStringView.getText().toString());
+            setResult(RESULT_OK, intent);
+            finish();
 
-            case R.id.btn_cancel:
-                setResult(RESULT_CANCELED);
-                finish();
-                break;
+        } else if (id == mFakeR.getId("btn_cancel")) {
+            setResult(RESULT_CANCELED);
+            finish();
 
-            case R.id.btn_repeat:
-                mScanResultImageView.setBackground(null);
-                mScanResultImageView.setVisibility(View.GONE);
-                mScanResultStringView.setVisibility(View.INVISIBLE);
-                mAcceptButton.setEnabled(false);
-                mRepeatButton.setEnabled(false);
-                mRecognizerView.resumeScanning(true);
-                break;
+        } else if (id == mFakeR.getId("btn_repeat")) {
+            mScanResultImageView.setBackground(null);
+            mScanResultImageView.setVisibility(View.GONE);
+            mScanResultStringView.setVisibility(View.INVISIBLE);
+            mAcceptButton.setEnabled(false);
+            mRepeatButton.setEnabled(false);
+            mRecognizerView.resumeScanning(true);
         }
     }
+
 
     @Override
     public void onScanningDone(@Nullable final RecognitionResults recognitionResults) {
@@ -496,7 +496,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                         mScanResultImageView.setImageBitmap(bitmap);
                     }
 
-                    String resultString = getString(R.string.blinkid_unknown_result);
+                    String resultString = mFakeR.getString("blinkid_unknown_result");
 
                     if (result instanceof VinScanResult) {
                         resultString = ((VinScanResult) result).getVin();
@@ -509,7 +509,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                                 resultString = parsedAmount;
                             }
                         } else {
-                            resultString = getString(R.string.blinkid_invalid_result_message);
+                            resultString = mFakeR.getString("blinkid_invalid_result_message");
                         }
                     }
 
@@ -536,9 +536,9 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         if (mActivityState == ActivityState.RESUMED || mActivityState == ActivityState.STARTED) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             ab.setCancelable(false)
-                    .setTitle(R.string.blinkid_error_dialog_title)
+                    .setTitle(mFakeR.getString("blinkid_error_dialog_title"))
                     .setMessage(throwable.getClass().getSimpleName() + ": " + throwable.getMessage())
-                    .setNeutralButton(R.string.blinkid_error_dialog_ok, new DialogInterface.OnClickListener() {
+                    .setNeutralButton(mFakeR.getString("blinkid_error_dialog_ok"), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (dialog != null) dialog.dismiss();
