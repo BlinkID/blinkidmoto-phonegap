@@ -67,7 +67,6 @@
         <resource-file src="src/android/res/values/strings.xml" target="res/values/blinkid-strings.xml" />
 
         <framework src="src/android/blinkid-android/libBlinkID.gradle" custom="true" type="gradleReference" />
-        <resource-file src="src/android/blinkid-android/LibBlinkID.aar" target="aar/LibBlinkID.aar" />
 
         <hook type="after_prepare" src="scripts/fix-largeheap.js" />
     </platform>
