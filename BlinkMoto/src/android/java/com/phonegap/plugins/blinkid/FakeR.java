@@ -4,12 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 
 /**
- * R replacement for PhoneGap Build.
- * <p>
- * ([^.\w])R\.(\w+)\.(\w+)
- * $1fakeR("$2", "$3")
- *
- * @author Maciej Nux Jaros
+ * Replacement for android resources <b>R</b> in PhoneGap plugins.<br/>
+ * Used for resources added with a plugin. Since the application has its own <b>R</b> the plugin must fetch its resources through the activity's context.
  */
 public class FakeR {
     private Context context;
