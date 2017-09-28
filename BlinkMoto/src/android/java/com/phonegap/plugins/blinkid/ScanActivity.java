@@ -221,10 +221,10 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mCancelButton = (Button) overlay.findViewById(R.id.btn_cancel);
         mRepeatButton = (Button) overlay.findViewById(R.id.btn_repeat);
         // Set user defined titles.
-        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, getString(R.string.scanning_title)));
-        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, getString(R.string.accept)));
-        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, getString(R.string.cancel)));
-        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, getString(R.string.repeat)));
+        mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, getString(R.string.blinkid_scanning_title)));
+        mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, getString(R.string.blinkid_accept)));
+        mCancelButton.setText(extras.getString(EXTRAS_CANCEL_STRING, getString(R.string.blinkid_cancel)));
+        mRepeatButton.setText(extras.getString(EXTRAS_REPEAT_STRING, getString(R.string.blinkid_repeat)));
         // Result image invisible at start.
         mScanResultImageView.setVisibility(View.GONE);
         // Cannot accept or retry when scanning is in progress.
@@ -267,7 +267,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                 }
 
                 // Subtract the relative horizontal padding
-                int horizontalPadding = (int) getResources().getDimension(R.dimen.scan_region_padding);
+                int horizontalPadding = (int) getResources().getDimension(R.dimen.blinkid_scan_region_padding);
                 width -= horizontalPadding * 2;
 
                 // Calculate the height based on given aspect ratio
@@ -496,7 +496,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                         mScanResultImageView.setImageBitmap(bitmap);
                     }
 
-                    String resultString = getString(R.string.unknown_result);
+                    String resultString = getString(R.string.blinkid_unknown_result);
 
                     if (result instanceof VinScanResult) {
                         resultString = ((VinScanResult) result).getVin();
@@ -509,7 +509,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
                                 resultString = parsedAmount;
                             }
                         } else {
-                            resultString = getString(R.string.invalid_result_message);
+                            resultString = getString(R.string.blinkid_invalid_result_message);
                         }
                     }
 
@@ -536,9 +536,9 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         if (mActivityState == ActivityState.RESUMED || mActivityState == ActivityState.STARTED) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             ab.setCancelable(false)
-                    .setTitle(R.string.error_dialog_title)
+                    .setTitle(R.string.blinkid_error_dialog_title)
                     .setMessage(throwable.getClass().getSimpleName() + ": " + throwable.getMessage())
-                    .setNeutralButton(R.string.error_dialog_ok, new DialogInterface.OnClickListener() {
+                    .setNeutralButton(R.string.blinkid_error_dialog_ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (dialog != null) dialog.dismiss();

@@ -17,12 +17,12 @@
             android:layout_above="@+id/horizontal_container"
 
             android:layout_alignParentTop="true"
-            android:background="@color/scan_shade"
+            android:background="@color/blinkid_scan_shade"
 
             android:padding="6dp"
             android:gravity="center_horizontal|bottom"
             android:textColor="#fff"
-            android:textSize="@dimen/scan_title_text_size"
+            android:textSize="@dimen/blinkid_scan_title_text_size"
             tools:text="Bitte die FIN / VIN oder Barcode in diesem Bereich erfassen" />
 
         <LinearLayout
@@ -33,9 +33,9 @@
             android:orientation="horizontal">
 
             <View
-                android:layout_width="@dimen/scan_region_padding"
+                android:layout_width="@dimen/blinkid_scan_region_padding"
                 android:layout_height="match_parent"
-                android:background="@color/scan_shade" />
+                android:background="@color/blinkid_scan_shade" />
 
             <FrameLayout
                 android:id="@+id/fl_scan_frame"
@@ -44,7 +44,7 @@
                 android:layout_weight="1"
                 android:padding="1dp"
 
-                android:background="@drawable/scan_frame"
+                android:background="@drawable/blinkid_scan_frame"
                 tools:layout_height="66dp">
 
                 <ImageView
@@ -52,15 +52,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
 
-                    android:contentDescription="@string/scanning_result_holder_desc"
+                    android:contentDescription="@string/blinkid_scanning_result_holder_desc"
                     android:scaleType="fitXY"
                     android:visibility="gone"/>
             </FrameLayout>
 
             <View
-                android:layout_width="@dimen/scan_region_padding"
+                android:layout_width="@dimen/blinkid_scan_region_padding"
                 android:layout_height="match_parent"
-                android:background="@color/scan_shade" />
+                android:background="@color/blinkid_scan_shade" />
         </LinearLayout>
 
         <RelativeLayout
@@ -71,7 +71,7 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@id/horizontal_container"
 
-            android:background="@color/scan_shade"
+            android:background="@color/blinkid_scan_shade"
             android:padding="12dp">
 
             <TextView
@@ -89,18 +89,18 @@
             <Button
                 android:id="@+id/btn_accept"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/btn_height"
+                android:layout_height="@dimen/blinkid_btn_height"
                 android:layout_alignParentBottom="true"
 
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/button_accent"
+                android:background="@drawable/blinkid_button_accent"
 
                 android:onClick="onButtonClicked"
 
-                android:padding="@dimen/btn_padding"
-                android:textColor="@drawable/button_accent_text_color"
-                android:textSize="@dimen/btn_text_size"
+                android:padding="@dimen/blinkid_btn_padding"
+                android:textColor="@drawable/blinkid_button_accent_text_color"
+                android:textSize="@dimen/blinkid_btn_text_size"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textAllCaps="false"
@@ -110,19 +110,19 @@
             <Button
                 android:id="@+id/btn_repeat"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/btn_height"
+                android:layout_height="@dimen/blinkid_btn_height"
                 android:layout_alignParentBottom="true"
 
-                android:layout_marginEnd="@dimen/btn_separation"
-                android:layout_marginRight="@dimen/btn_separation"
+                android:layout_marginEnd="@dimen/blinkid_btn_separation"
+                android:layout_marginRight="@dimen/blinkid_btn_separation"
                 android:layout_toLeftOf="@+id/btn_accept"
                 android:layout_toStartOf="@+id/btn_accept"
-                android:background="@drawable/button_normal"
+                android:background="@drawable/blinkid_button_normal"
 
                 android:onClick="onButtonClicked"
 
-                android:padding="@dimen/btn_padding"
-                android:textSize="@dimen/btn_text_size"
+                android:padding="@dimen/blinkid_btn_padding"
+                android:textSize="@dimen/blinkid_btn_text_size"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textAllCaps="false"
@@ -132,19 +132,19 @@
             <Button
                 android:id="@+id/btn_cancel"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/btn_height"
+                android:layout_height="@dimen/blinkid_btn_height"
                 android:layout_alignParentBottom="true"
 
-                android:layout_marginEnd="@dimen/btn_separation"
-                android:layout_marginRight="@dimen/btn_separation"
+                android:layout_marginEnd="@dimen/blinkid_btn_separation"
+                android:layout_marginRight="@dimen/blinkid_btn_separation"
                 android:layout_toLeftOf="@+id/btn_repeat"
                 android:layout_toStartOf="@+id/btn_repeat"
-                android:background="@drawable/button_normal"
+                android:background="@drawable/blinkid_button_normal"
 
                 android:onClick="onButtonClicked"
 
-                android:padding="@dimen/btn_padding"
-                android:textSize="@dimen/btn_text_size"
+                android:padding="@dimen/blinkid_btn_padding"
+                android:textSize="@dimen/blinkid_btn_text_size"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textAllCaps="false"
