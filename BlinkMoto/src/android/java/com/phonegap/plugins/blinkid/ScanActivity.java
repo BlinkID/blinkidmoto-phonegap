@@ -62,8 +62,12 @@ import com.microblink.view.ocrResult.OcrResultDotsView;
 import com.microblink.view.recognition.RecognizerView;
 import com.microblink.view.recognition.ScanResultListener;
 import com.microblink.view.viewfinder.PointSetView;
+import com.phonegap.plugins.blinkid.resulthistory.AcceptFirstResultHistory;
+import com.phonegap.plugins.blinkid.resulthistory.ResultHistory;
+import com.phonegap.plugins.blinkid.resulthistory.VinResultHistory;
 
 public class ScanActivity extends Activity implements ScanResultListener, CameraEventsListener, MetadataListener, OnActivityFlipListener {
+
     public static final String EXTRAS_LICENSE_KEY = "key_license_string";
     public static final String EXTRAS_RECOGNIZER_TYPE = "key_recognizer_type_string";
     public static final String EXTRAS_TITLE_STRING = "key_title_string";
@@ -74,6 +78,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     public static final String EXTRAS_RESULT_STRING = "key_result_string";
 
     private static final float SCANNING_REGION_ASPECT_RATIO = 1 / 4f;
+    private ResultHistory mResultHistory;
 
     public enum RecognizerType {
         VIN, LICENCE_PLATES
@@ -104,7 +109,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         RESUMED
     }
 
-    private com.phonegap.plugins.blinkid.ScanActivity.ActivityState mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.DESTROYED;
+    private ActivityState mActivityState = ActivityState.DESTROYED;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,7 +131,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             }
         }
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.CREATED;
+        mActivityState = ActivityState.CREATED;
 
         // Set internationalized strings.
         Bundle extras = getIntent().getExtras();
@@ -155,7 +160,11 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             throw new NullPointerException("Recognizer type extra missing.");
         }
 
-        RecognizerSettings[] settArray = setupSettingsArray((com.phonegap.plugins.blinkid.ScanActivity.RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE));
+        RecognizerType recognizerType = (RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE);
+
+        createResultHistory(recognizerType);
+
+        RecognizerSettings[] settArray = setupSettingsArray(recognizerType);
         if (!RecognizerCompatibility.cameraHasAutofocus(CameraType.CAMERA_BACKFACE, this)) {
             settArray = RecognizerSettingsUtils.filterOutRecognizersThatRequireAutofocus(settArray);
         }
@@ -236,6 +245,14 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         resizeScanningRegion();
     }
 
+    private void createResultHistory(RecognizerType recognizerType) {
+        if(recognizerType == RecognizerType.VIN) {
+            mResultHistory = new VinResultHistory();
+        } else {
+            mResultHistory = new AcceptFirstResultHistory();
+        }
+    }
+
     private void resizeScanningRegion() {
         if (mRecognizerView == null || mRecognizerViewRoot == null) {
             return;
@@ -294,14 +311,14 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         });
     }
 
-    private RecognizerSettings[] setupSettingsArray(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType type) {
+    private RecognizerSettings[] setupSettingsArray(RecognizerType type) {
         BlinkInputRecognizerSettings ocrSettings = new BlinkInputRecognizerSettings();
 
-        if (type.equals(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType.LICENCE_PLATES)) {
+        if (type.equals(RecognizerType.LICENCE_PLATES)) {
             ocrSettings.addParser(OCR_PARSER_NAME, new LicensePlatesParserSettings());
             return new RecognizerSettings[]{ocrSettings};
 
-        } else if (type.equals(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType.VIN)) {
+        } else if (type.equals(RecognizerType.VIN)) {
             ocrSettings.addParser(OCR_PARSER_NAME, new VinParserSettings());
 
             VinRecognizerSettings vinRecognizerSettings = new VinRecognizerSettings();
@@ -355,7 +372,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onStart() {
         super.onStart();
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED;
+        mActivityState = ActivityState.STARTED;
         if (mRecognizerView != null) {
             mRecognizerView.start();
         }
@@ -365,7 +382,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onResume() {
         super.onResume();
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.RESUMED;
+        mActivityState = ActivityState.RESUMED;
         if (mRecognizerView != null) {
             mRecognizerView.resume();
 
@@ -380,7 +397,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onPause() {
         super.onPause();
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED;
+        mActivityState = ActivityState.STARTED;
         if (mRecognizerView != null) {
             mRecognizerView.pause();
         }
@@ -390,7 +407,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onStop() {
         super.onStop();
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.CREATED;
+        mActivityState = ActivityState.CREATED;
         if (mRecognizerView != null) {
             mRecognizerView.stop();
         }
@@ -400,7 +417,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onDestroy() {
         super.onDestroy();
 
-        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.DESTROYED;
+        mActivityState = ActivityState.DESTROYED;
         if (mRecognizerView != null) {
             mRecognizerView.destroy();
         }
@@ -438,6 +455,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             finish();
 
         } else if (id == mFakeR.getId("btn_repeat")) {
+            mResultHistory.clear();
             mScanResultImageView.setBackground(null);
             mScanResultImageView.setVisibility(View.GONE);
             mScanResultStringView.setVisibility(View.INVISIBLE);
@@ -460,63 +478,70 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             return;
         }
 
-        if (!isFinishing() && mRecognizerView != null && mRecognizerView.getCameraViewState() == BaseCameraView.CameraViewState.RESUMED) {
-            final BaseRecognitionResult result = recognitionResults.getRecognitionResults()[0];
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mAcceptButton.setEnabled(true);
-                    mRepeatButton.setEnabled(true);
-                    mScanResultImageView.setVisibility(View.VISIBLE);
-                    mScanResultStringView.setVisibility(View.VISIBLE);
-
-                    if (mResultImage != null) {
-
-                        Bitmap bitmap = mResultImage.convertToBitmap();
-                        if (bitmap == null) {
-                            return;
-                        }
-                        Matrix matrix = new Matrix();
-                        switch (mResultImage.getImageOrientation()) {
-                            case ORIENTATION_LANDSCAPE_LEFT:
-                                matrix.postRotate(180);
-                                break;
-                            case ORIENTATION_PORTRAIT:
-                                matrix.postRotate(90);
-                                break;
-                            case ORIENTATION_PORTRAIT_UPSIDE:
-                                matrix.postRotate(-90);
-                                break;
-                        }
-
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                        mScanResultImageView.setImageBitmap(bitmap);
-                    }
-
-                    String resultString = mFakeR.getString("blinkid_unknown_result");
-
-                    if (result instanceof VinScanResult) {
-                        resultString = ((VinScanResult) result).getVin();
-
-                    } else if (result instanceof BlinkInputRecognitionResult) {
-                        BlinkInputRecognitionResult biResult = (BlinkInputRecognitionResult) result;
-                        if (biResult.isValid() && !biResult.isEmpty()) {
-                            String parsedAmount = biResult.getParsedResult(OCR_PARSER_NAME);
-                            if (parsedAmount != null && !parsedAmount.isEmpty()) {
-                                resultString = parsedAmount;
-                            }
-                        } else {
-                            resultString = mFakeR.getString("blinkid_invalid_result_message");
-                        }
-                    }
-
-                    mScanResultStringView.setText(resultString);
-                }
-            });
-        } else {
+        if(isFinishing() || mRecognizerView == null || mRecognizerView.getCameraViewState() != BaseCameraView.CameraViewState.RESUMED) {
             mRecognizerView.resumeScanning(false);
+            return;
         }
+
+        final BaseRecognitionResult result = recognitionResults.getRecognitionResults()[0];
+        mResultHistory.onNewResult(extractResultString(result));
+        if (!mResultHistory.hasValidResult()) {
+            mRecognizerView.resumeScanning(false);
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAcceptButton.setEnabled(true);
+                mRepeatButton.setEnabled(true);
+                mScanResultImageView.setVisibility(View.VISIBLE);
+                mScanResultStringView.setVisibility(View.VISIBLE);
+
+                if (mResultImage != null) {
+
+                    Bitmap bitmap = mResultImage.convertToBitmap();
+                    if (bitmap == null) {
+                        return;
+                    }
+                    Matrix matrix = new Matrix();
+                    switch (mResultImage.getImageOrientation()) {
+                        case ORIENTATION_LANDSCAPE_LEFT:
+                            matrix.postRotate(180);
+                            break;
+                        case ORIENTATION_PORTRAIT:
+                            matrix.postRotate(90);
+                            break;
+                        case ORIENTATION_PORTRAIT_UPSIDE:
+                            matrix.postRotate(-90);
+                            break;
+                    }
+
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    mScanResultImageView.setImageBitmap(bitmap);
+                }
+
+                mScanResultStringView.setText(mResultHistory.getResult());
+            }
+        });
+    }
+
+    private String extractResultString(BaseRecognitionResult result) {
+        String resultString = mFakeR.getString("blinkid_unknown_result");
+        if (result instanceof VinScanResult) {
+            resultString = ((VinScanResult) result).getVin();
+        } else if (result instanceof BlinkInputRecognitionResult) {
+            BlinkInputRecognitionResult biResult = (BlinkInputRecognitionResult) result;
+            if (biResult.isValid() && !biResult.isEmpty()) {
+                String parsedAmount = biResult.getParsedResult(OCR_PARSER_NAME);
+                if (parsedAmount != null && !parsedAmount.isEmpty()) {
+                    resultString = parsedAmount;
+                }
+            } else {
+                resultString = mFakeR.getString("blinkid_invalid_result_message");
+            }
+        }
+        return resultString;
     }
 
     @Override
@@ -531,7 +556,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     @Override
     public void onError(Throwable throwable) {
-        if (mActivityState == com.phonegap.plugins.blinkid.ScanActivity.ActivityState.RESUMED || mActivityState == com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED) {
+        if (mActivityState == ActivityState.RESUMED || mActivityState == ActivityState.STARTED) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             ab.setCancelable(false)
                     .setTitle(mFakeR.getString("blinkid_error_dialog_title"))

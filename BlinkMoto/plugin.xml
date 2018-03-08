@@ -53,7 +53,11 @@
         <source-file src="src/android/java/com/phonegap/plugins/blinkid/BlinkIdScanner.java" target-dir="src/com/phonegap/plugins/blinkid" />
         <source-file src="src/android/java/com/phonegap/plugins/blinkid/ScanActivity.java" target-dir="src/com/phonegap/plugins/blinkid" />
         <source-file src="src/android/java/com/phonegap/plugins/blinkid/FakeR.java" target-dir="src/com/phonegap/plugins/blinkid" />
-        
+
+        <source-file src="src/android/java/com/phonegap/plugins/blinkid/resulthistory/AcceptFirstResultHistory.java" target-dir="src/com/phonegap/plugins/blinkid/resulthistory" />
+        <source-file src="src/android/java/com/phonegap/plugins/blinkid/resulthistory/ResultHistory.java" target-dir="src/com/phonegap/plugins/blinkid/resulthistory" />
+        <source-file src="src/android/java/com/phonegap/plugins/blinkid/resulthistory/VinResultHistory.java" target-dir="src/com/phonegap/plugins/blinkid/resulthistory" />
+
         <resource-file src="src/android/res/drawable/blinkid_button_accent_text_color.xml" target="res/drawable/blinkid_button_accent_text_color.xml" />
         <resource-file src="src/android/res/drawable/blinkid_button_accent.xml" target="res/drawable/blinkid_button_accent.xml" />
         <resource-file src="src/android/res/drawable/blinkid_button_normal.xml" target="res/drawable/blinkid_button_normal.xml" />
