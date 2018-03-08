@@ -90,11 +90,9 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     private FrameLayout mRecognizerViewRoot;
     private FrameLayout mScanViewfinder;
-    private TextView mScanTitleView;
     private TextView mScanResultStringView;
     private ImageView mScanResultImageView;
     private Button mAcceptButton;
-    private Button mCancelButton;
     private Button mRepeatButton;
 
     private Image mResultImage;
@@ -106,7 +104,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         RESUMED
     }
 
-    private ActivityState mActivityState = ActivityState.DESTROYED;
+    private com.phonegap.plugins.blinkid.ScanActivity.ActivityState mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.DESTROYED;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,12 +126,12 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             }
         }
 
-        mActivityState = ActivityState.CREATED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.CREATED;
 
         // Set internationalized strings.
         Bundle extras = getIntent().getExtras();
 
-        mRecognizerView = (RecognizerView) findViewById(mFakeR.getId("recognizerView"));
+        mRecognizerView = findViewById(mFakeR.getId("recognizerView"));
 
         // Set license key.
         String licenseKey = extras.getString(EXTRAS_LICENSE_KEY);
@@ -145,7 +143,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
         // Add the camera permissions overlay.
         mCameraPermManager = new CameraPermissionManager(this);
-        mRecognizerViewRoot = (FrameLayout) findViewById(mFakeR.getId("recognizerViewRoot"));
+        mRecognizerViewRoot = findViewById(mFakeR.getId("recognizerViewRoot"));
         View cameraPermissionView = mCameraPermManager.getAskPermissionOverlay();
         if (cameraPermissionView != null) {
             mRecognizerViewRoot.addView(cameraPermissionView);
@@ -157,7 +155,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             throw new NullPointerException("Recognizer type extra missing.");
         }
 
-        RecognizerSettings[] settArray = setupSettingsArray((RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE));
+        RecognizerSettings[] settArray = setupSettingsArray((com.phonegap.plugins.blinkid.ScanActivity.RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE));
         if (!RecognizerCompatibility.cameraHasAutofocus(CameraType.CAMERA_BACKFACE, this)) {
             settArray = RecognizerSettingsUtils.filterOutRecognizersThatRequireAutofocus(settArray);
         }
@@ -215,13 +213,13 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         // Inflate the overlay view.
         final ViewGroup overlay = (ViewGroup) getLayoutInflater().inflate(mFakeR.getIdFrom("layout", "custom_scan_overlay"), null);
         // Bind view elements.
-        mScanViewfinder = (FrameLayout) overlay.findViewById(mFakeR.getId("fl_scan_frame"));
-        mScanTitleView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_title"));
-        mScanResultStringView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_result"));
-        mScanResultImageView = (ImageView) overlay.findViewById(mFakeR.getId("iv_scan_result"));
-        mAcceptButton = (Button) overlay.findViewById(mFakeR.getId("btn_accept"));
-        mCancelButton = (Button) overlay.findViewById(mFakeR.getId("btn_cancel"));
-        mRepeatButton = (Button) overlay.findViewById(mFakeR.getId("btn_repeat"));
+        mScanViewfinder = overlay.findViewById(mFakeR.getId("fl_scan_frame"));
+        TextView mScanTitleView = overlay.findViewById(mFakeR.getId("tv_scan_title"));
+        mScanResultStringView = overlay.findViewById(mFakeR.getId("tv_scan_result"));
+        mScanResultImageView = overlay.findViewById(mFakeR.getId("iv_scan_result"));
+        mAcceptButton = overlay.findViewById(mFakeR.getId("btn_accept"));
+        Button mCancelButton = overlay.findViewById(mFakeR.getId("btn_cancel"));
+        mRepeatButton = overlay.findViewById(mFakeR.getId("btn_repeat"));
         // Set user defined titles.
         mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, mFakeR.getString("blinkid_scanning_title")));
         mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, mFakeR.getString("blinkid_accept")));
@@ -296,14 +294,14 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         });
     }
 
-    private RecognizerSettings[] setupSettingsArray(RecognizerType type) {
+    private RecognizerSettings[] setupSettingsArray(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType type) {
         BlinkInputRecognizerSettings ocrSettings = new BlinkInputRecognizerSettings();
 
-        if (type.equals(RecognizerType.LICENCE_PLATES)) {
+        if (type.equals(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType.LICENCE_PLATES)) {
             ocrSettings.addParser(OCR_PARSER_NAME, new LicensePlatesParserSettings());
             return new RecognizerSettings[]{ocrSettings};
 
-        } else if (type.equals(RecognizerType.VIN)) {
+        } else if (type.equals(com.phonegap.plugins.blinkid.ScanActivity.RecognizerType.VIN)) {
             ocrSettings.addParser(OCR_PARSER_NAME, new VinParserSettings());
 
             VinRecognizerSettings vinRecognizerSettings = new VinRecognizerSettings();
@@ -357,7 +355,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onStart() {
         super.onStart();
 
-        mActivityState = ActivityState.STARTED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED;
         if (mRecognizerView != null) {
             mRecognizerView.start();
         }
@@ -367,7 +365,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onResume() {
         super.onResume();
 
-        mActivityState = ActivityState.RESUMED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.RESUMED;
         if (mRecognizerView != null) {
             mRecognizerView.resume();
 
@@ -382,7 +380,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onPause() {
         super.onPause();
 
-        mActivityState = ActivityState.STARTED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED;
         if (mRecognizerView != null) {
             mRecognizerView.pause();
         }
@@ -392,7 +390,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onStop() {
         super.onStop();
 
-        mActivityState = ActivityState.CREATED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.CREATED;
         if (mRecognizerView != null) {
             mRecognizerView.stop();
         }
@@ -402,7 +400,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     protected void onDestroy() {
         super.onDestroy();
 
-        mActivityState = ActivityState.DESTROYED;
+        mActivityState = com.phonegap.plugins.blinkid.ScanActivity.ActivityState.DESTROYED;
         if (mRecognizerView != null) {
             mRecognizerView.destroy();
         }
@@ -533,7 +531,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     @Override
     public void onError(Throwable throwable) {
-        if (mActivityState == ActivityState.RESUMED || mActivityState == ActivityState.STARTED) {
+        if (mActivityState == com.phonegap.plugins.blinkid.ScanActivity.ActivityState.RESUMED || mActivityState == com.phonegap.plugins.blinkid.ScanActivity.ActivityState.STARTED) {
             AlertDialog.Builder ab = new AlertDialog.Builder(this);
             ab.setCancelable(false)
                     .setTitle(mFakeR.getString("blinkid_error_dialog_title"))
