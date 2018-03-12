@@ -8,6 +8,7 @@
 
 #import "PPOcrOverlayViewController.h"
 #import "PPOcrOverlayViewController+Private.h"
+#import "PPScanResultHistory.h"
 
 @interface PPOcrOverlayViewController ()<PPOcrFinderViewDelegate>
 
@@ -23,6 +24,8 @@
 
 @property (nonatomic, strong) NSDictionary *translation;
 
+@property (nonatomic) PPScanResultHistory *history;
+
 @end
 
 static NSString * const kVinOcrParser = @"VIN OCR Parser";
@@ -35,6 +38,7 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
     if (self) {
         self.orcRecognizerType = ocrRecognizerType;
         self.translation = translation;
+        self.history = [[PPScanResultHistory alloc] initWithThreshold:3];
     }
     
     return self;
@@ -222,16 +226,15 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
             switch (self.orcRecognizerType) {
                 case VIN:
                     resultVin = [ocrRecognizerResult parsedResultForName:kVinOcrParser];
-                    success = YES;
+                    success = [self.history pushResult:resultVin];
                     break;
                 case LicensePlate:
                     resultVin =  [ocrRecognizerResult parsedResultForName:kLicensePlateOcrParser];
-                    success = YES;
+                    success = [self.history pushResult:resultVin];
                     break;
                 default:
                     resultVin =  @"";
                     success = NO;
-                    [cameraViewController resumeScanningAndResetState:YES];
                     break;
             }
             
@@ -240,10 +243,14 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
         if ([result isKindOfClass:[PPVinRecognizerResult class]]) {
             PPVinRecognizerResult *vinRecognizerResult = (PPVinRecognizerResult *)result;
             resultVin = vinRecognizerResult.vinNumber;
-            success = YES;
+            success = [self.history pushResult:resultVin];
         }
-        
-        [_viewfinder setOcrResultSucces:success withResult:resultVin andImage:self.currentImageMetadata.image];
+        if (success) {
+            [self.history resetState];
+            [_viewfinder setOcrResultSucces:success withResult:resultVin andImage:self.currentImageMetadata.image];
+        } else {
+            [cameraViewController resumeScanningAndResetState:YES];
+        }
         
     }
 }
