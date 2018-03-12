@@ -46,7 +46,7 @@ var app = {
         // Note that each platform requires its own license key
 
         // This license key allows setting overlay views for this application ID: com.microblink.blinkid
-        var licenseiOs = "5HGZOCUB-TYV54NRY-O53F5JTM-DV6I6N6P-URCUE5H7-Y66MDAM6-FC4NRQTN-DEIDA2LN"; // Valid until 2017-08-05
+        var licenseiOs = "R23ALVMH-2UTECJBQ-3L25IWY5-R5FKXY5K-I6PCROGY-MJXP7R54-YGAZ5CBH-AR6YVLRA"; // Valid until 2018-06-07
 
         // This license is only valid for package name "com.microblink.blinkid"
         var licenseAndroid = "PDSEMRTP-ACSCUVIA-UBIBQNDG-D7CPIENL-WHW2TLUQ-T6G73F3U-GEM3F7HQ-MVGDHQLY";
