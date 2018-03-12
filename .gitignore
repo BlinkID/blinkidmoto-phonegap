@@ -60,3 +60,5 @@ fastlane/screenshots
 iOSInjectionProject/
 
 BlinkMotoDemo
+
+.DS_Store
