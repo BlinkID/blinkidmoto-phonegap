@@ -62,8 +62,12 @@ import com.microblink.view.ocrResult.OcrResultDotsView;
 import com.microblink.view.recognition.RecognizerView;
 import com.microblink.view.recognition.ScanResultListener;
 import com.microblink.view.viewfinder.PointSetView;
+import com.phonegap.plugins.blinkid.resulthistory.AcceptFirstResultHistory;
+import com.phonegap.plugins.blinkid.resulthistory.ResultHistory;
+import com.phonegap.plugins.blinkid.resulthistory.VinResultHistory;
 
 public class ScanActivity extends Activity implements ScanResultListener, CameraEventsListener, MetadataListener, OnActivityFlipListener {
+
     public static final String EXTRAS_LICENSE_KEY = "key_license_string";
     public static final String EXTRAS_RECOGNIZER_TYPE = "key_recognizer_type_string";
     public static final String EXTRAS_TITLE_STRING = "key_title_string";
@@ -74,6 +78,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
     public static final String EXTRAS_RESULT_STRING = "key_result_string";
 
     private static final float SCANNING_REGION_ASPECT_RATIO = 1 / 4f;
+    private ResultHistory mResultHistory;
 
     public enum RecognizerType {
         VIN, LICENCE_PLATES
@@ -90,11 +95,9 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
     private FrameLayout mRecognizerViewRoot;
     private FrameLayout mScanViewfinder;
-    private TextView mScanTitleView;
     private TextView mScanResultStringView;
     private ImageView mScanResultImageView;
     private Button mAcceptButton;
-    private Button mCancelButton;
     private Button mRepeatButton;
 
     private Image mResultImage;
@@ -133,7 +136,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         // Set internationalized strings.
         Bundle extras = getIntent().getExtras();
 
-        mRecognizerView = (RecognizerView) findViewById(mFakeR.getId("recognizerView"));
+        mRecognizerView = findViewById(mFakeR.getId("recognizerView"));
 
         // Set license key.
         String licenseKey = extras.getString(EXTRAS_LICENSE_KEY);
@@ -145,7 +148,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
 
         // Add the camera permissions overlay.
         mCameraPermManager = new CameraPermissionManager(this);
-        mRecognizerViewRoot = (FrameLayout) findViewById(mFakeR.getId("recognizerViewRoot"));
+        mRecognizerViewRoot = findViewById(mFakeR.getId("recognizerViewRoot"));
         View cameraPermissionView = mCameraPermManager.getAskPermissionOverlay();
         if (cameraPermissionView != null) {
             mRecognizerViewRoot.addView(cameraPermissionView);
@@ -157,7 +160,11 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             throw new NullPointerException("Recognizer type extra missing.");
         }
 
-        RecognizerSettings[] settArray = setupSettingsArray((RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE));
+        RecognizerType recognizerType = (RecognizerType) extras.getSerializable(EXTRAS_RECOGNIZER_TYPE);
+
+        createResultHistory(recognizerType);
+
+        RecognizerSettings[] settArray = setupSettingsArray(recognizerType);
         if (!RecognizerCompatibility.cameraHasAutofocus(CameraType.CAMERA_BACKFACE, this)) {
             settArray = RecognizerSettingsUtils.filterOutRecognizersThatRequireAutofocus(settArray);
         }
@@ -215,13 +222,13 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         // Inflate the overlay view.
         final ViewGroup overlay = (ViewGroup) getLayoutInflater().inflate(mFakeR.getIdFrom("layout", "custom_scan_overlay"), null);
         // Bind view elements.
-        mScanViewfinder = (FrameLayout) overlay.findViewById(mFakeR.getId("fl_scan_frame"));
-        mScanTitleView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_title"));
-        mScanResultStringView = (TextView) overlay.findViewById(mFakeR.getId("tv_scan_result"));
-        mScanResultImageView = (ImageView) overlay.findViewById(mFakeR.getId("iv_scan_result"));
-        mAcceptButton = (Button) overlay.findViewById(mFakeR.getId("btn_accept"));
-        mCancelButton = (Button) overlay.findViewById(mFakeR.getId("btn_cancel"));
-        mRepeatButton = (Button) overlay.findViewById(mFakeR.getId("btn_repeat"));
+        mScanViewfinder = overlay.findViewById(mFakeR.getId("fl_scan_frame"));
+        TextView mScanTitleView = overlay.findViewById(mFakeR.getId("tv_scan_title"));
+        mScanResultStringView = overlay.findViewById(mFakeR.getId("tv_scan_result"));
+        mScanResultImageView = overlay.findViewById(mFakeR.getId("iv_scan_result"));
+        mAcceptButton = overlay.findViewById(mFakeR.getId("btn_accept"));
+        Button mCancelButton = overlay.findViewById(mFakeR.getId("btn_cancel"));
+        mRepeatButton = overlay.findViewById(mFakeR.getId("btn_repeat"));
         // Set user defined titles.
         mScanTitleView.setText(extras.getString(EXTRAS_TITLE_STRING, mFakeR.getString("blinkid_scanning_title")));
         mAcceptButton.setText(extras.getString(EXTRAS_ACCEPT_STRING, mFakeR.getString("blinkid_accept")));
@@ -236,6 +243,14 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
         mRecognizerView.addChildView(overlay, true);
 
         resizeScanningRegion();
+    }
+
+    private void createResultHistory(RecognizerType recognizerType) {
+        if(recognizerType == RecognizerType.VIN) {
+            mResultHistory = new VinResultHistory();
+        } else {
+            mResultHistory = new AcceptFirstResultHistory();
+        }
     }
 
     private void resizeScanningRegion() {
@@ -440,6 +455,7 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             finish();
 
         } else if (id == mFakeR.getId("btn_repeat")) {
+            mResultHistory.clear();
             mScanResultImageView.setBackground(null);
             mScanResultImageView.setVisibility(View.GONE);
             mScanResultStringView.setVisibility(View.INVISIBLE);
@@ -462,63 +478,70 @@ public class ScanActivity extends Activity implements ScanResultListener, Camera
             return;
         }
 
-        if (!isFinishing() && mRecognizerView != null && mRecognizerView.getCameraViewState() == BaseCameraView.CameraViewState.RESUMED) {
-            final BaseRecognitionResult result = recognitionResults.getRecognitionResults()[0];
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mAcceptButton.setEnabled(true);
-                    mRepeatButton.setEnabled(true);
-                    mScanResultImageView.setVisibility(View.VISIBLE);
-                    mScanResultStringView.setVisibility(View.VISIBLE);
-
-                    if (mResultImage != null) {
-
-                        Bitmap bitmap = mResultImage.convertToBitmap();
-                        if (bitmap == null) {
-                            return;
-                        }
-                        Matrix matrix = new Matrix();
-                        switch (mResultImage.getImageOrientation()) {
-                            case ORIENTATION_LANDSCAPE_LEFT:
-                                matrix.postRotate(180);
-                                break;
-                            case ORIENTATION_PORTRAIT:
-                                matrix.postRotate(90);
-                                break;
-                            case ORIENTATION_PORTRAIT_UPSIDE:
-                                matrix.postRotate(-90);
-                                break;
-                        }
-
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                        mScanResultImageView.setImageBitmap(bitmap);
-                    }
-
-                    String resultString = mFakeR.getString("blinkid_unknown_result");
-
-                    if (result instanceof VinScanResult) {
-                        resultString = ((VinScanResult) result).getVin();
-
-                    } else if (result instanceof BlinkInputRecognitionResult) {
-                        BlinkInputRecognitionResult biResult = (BlinkInputRecognitionResult) result;
-                        if (biResult.isValid() && !biResult.isEmpty()) {
-                            String parsedAmount = biResult.getParsedResult(OCR_PARSER_NAME);
-                            if (parsedAmount != null && !parsedAmount.isEmpty()) {
-                                resultString = parsedAmount;
-                            }
-                        } else {
-                            resultString = mFakeR.getString("blinkid_invalid_result_message");
-                        }
-                    }
-
-                    mScanResultStringView.setText(resultString);
-                }
-            });
-        } else {
+        if(isFinishing() || mRecognizerView == null || mRecognizerView.getCameraViewState() != BaseCameraView.CameraViewState.RESUMED) {
             mRecognizerView.resumeScanning(false);
+            return;
         }
+
+        final BaseRecognitionResult result = recognitionResults.getRecognitionResults()[0];
+        mResultHistory.onNewResult(extractResultString(result));
+        if (!mResultHistory.hasValidResult()) {
+            mRecognizerView.resumeScanning(false);
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAcceptButton.setEnabled(true);
+                mRepeatButton.setEnabled(true);
+                mScanResultImageView.setVisibility(View.VISIBLE);
+                mScanResultStringView.setVisibility(View.VISIBLE);
+
+                if (mResultImage != null) {
+
+                    Bitmap bitmap = mResultImage.convertToBitmap();
+                    if (bitmap == null) {
+                        return;
+                    }
+                    Matrix matrix = new Matrix();
+                    switch (mResultImage.getImageOrientation()) {
+                        case ORIENTATION_LANDSCAPE_LEFT:
+                            matrix.postRotate(180);
+                            break;
+                        case ORIENTATION_PORTRAIT:
+                            matrix.postRotate(90);
+                            break;
+                        case ORIENTATION_PORTRAIT_UPSIDE:
+                            matrix.postRotate(-90);
+                            break;
+                    }
+
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    mScanResultImageView.setImageBitmap(bitmap);
+                }
+
+                mScanResultStringView.setText(mResultHistory.getResult());
+            }
+        });
+    }
+
+    private String extractResultString(BaseRecognitionResult result) {
+        String resultString = mFakeR.getString("blinkid_unknown_result");
+        if (result instanceof VinScanResult) {
+            resultString = ((VinScanResult) result).getVin();
+        } else if (result instanceof BlinkInputRecognitionResult) {
+            BlinkInputRecognitionResult biResult = (BlinkInputRecognitionResult) result;
+            if (biResult.isValid() && !biResult.isEmpty()) {
+                String parsedAmount = biResult.getParsedResult(OCR_PARSER_NAME);
+                if (parsedAmount != null && !parsedAmount.isEmpty()) {
+                    resultString = parsedAmount;
+                }
+            } else {
+                resultString = mFakeR.getString("blinkid_invalid_result_message");
+            }
+        }
+        return resultString;
     }
 
     @Override
