@@ -82,6 +82,8 @@
         <source-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.m" />
         <header-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.h" />
         <header-file src="src/ios/sources/Overlay/PPOcrOverlayViewController+Private.h" />
+        <header-file src="src/ios/sources/PPScanResultHistory.h" />
+        <source-file src="src/ios/sources/PPScanResultHistory.m" />
         
         <framework src="libc++.dylib" />
         <framework src="libz.dylib" />
