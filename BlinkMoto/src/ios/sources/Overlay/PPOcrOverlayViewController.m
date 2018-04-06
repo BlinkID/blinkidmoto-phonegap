@@ -207,6 +207,17 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
     }
 }
 
+- (BOOL)isVinStandard:(NSString *)vin {
+    unichar c = [vin characterAtIndex:0];
+
+    if (c == 'I' || c == '1') {
+        NSLog(@"Vin starts with I or 1");
+        return NO;
+    }
+
+    return YES;
+}
+
 - (void)cameraViewController:(UIViewController<PPScanningViewController> *)cameraViewController didOutputResults:(NSArray *)results {
     
     // First we check that we received a valid result!
@@ -226,7 +237,9 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
             switch (self.orcRecognizerType) {
                 case VIN:
                     resultVin = [ocrRecognizerResult parsedResultForName:kVinOcrParser];
-                    success = [self.history pushResult:resultVin];
+                    if ([self isVinStandard:resultVin]) {
+                        success = [self.history pushResult:resultVin];
+                    }
                     break;
                 case LicensePlate:
                     resultVin =  [ocrRecognizerResult parsedResultForName:kLicensePlateOcrParser];
