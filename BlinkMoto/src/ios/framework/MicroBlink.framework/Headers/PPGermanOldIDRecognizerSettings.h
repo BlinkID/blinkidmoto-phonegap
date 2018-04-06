@@ -40,6 +40,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
 + (NSString *)FULL_DOCUMENT_IMAGE;
 
 /**
+ * Defines if owner's place of birth should be extracted from German ID
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL extractPlaceOfBirth;
+
+/**
  * Sets whether face image from ID card should be sent to didOutputMetadata method of scanDelegate object.
  * If you want to recieve this image, be sure to enable dewarpedImage in MetadataSettings.
  *
@@ -62,6 +69,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO
  */
 @property (nonatomic, assign) BOOL returnFullDocumentPhoto;
+
+/**
+ * Defines if glare detection should be turned on/off for old German IDs.
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL detectGlare;
 
 @end
 

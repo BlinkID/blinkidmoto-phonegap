@@ -27,6 +27,11 @@
 @optional
 
 /**
+ * Called when coordinator has released all resources and has finished deallocating
+ */
+- (void)coordinatorDidDealloc;
+
+/**
  * Called when the recognition of a current image is initiated
  */
 - (void)coordinatorDidStartDetection:(PPCoordinator *)coordinator;
@@ -81,6 +86,11 @@
  * Called when the we have an error with the license key
  */
 - (void)coordinator:(PPCoordinator *)coordinator invalidLicenseKeyWithError:(NSError *)error;
+
+/**
+ * Called when the we have license key with time restriction
+ */
+- (void)coordinator:(PPCoordinator *)coordinator isLicenseKeyTimeRestricted:(BOOL)timeRestricted;
 
 /**
  * TODO Ugly way of passing UI-related transformation information that should not be here

@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
  * German Combined ID recognizer is used for scanning both front and back side of german IDs.
  */
 PP_CLASS_AVAILABLE_IOS(6.0)
-
 @interface PPGermanIDCombinedRecognizerSettings : PPCombinedRecognizerSettings
 
 /**
@@ -91,6 +90,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO
  */
 @property (nonatomic, assign) BOOL encodeFullDocumentPhoto;
+
+/**
+ * Defines if glare detection should be turned on/off for both front and back sides of German IDs.
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL detectGlare;
 
 @end
 

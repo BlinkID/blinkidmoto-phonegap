@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Class used for OCR or Templating API
  */
-PP_CLASS_AVAILABLE_IOS(6.0)
+PP_CLASS_DEPRECATED_IOS(1_0, 5_10_0, "Use PPDetectorRecognizerSettings for templating API or PPBlinkInputRecognizerSettings for Segment scan")
 @interface PPBlinkOcrRecognizerSettings : PPTemplatingRecognizerSettings
 
 - (instancetype)init;
@@ -51,13 +51,6 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO
  */
 @property (nonatomic) BOOL allowFlippedRecognition;
-
-/**
- * Delegate for document classification.
- *
- * Default: nil
- */
-@property (nonatomic) id<PPDocumentClassifier> documentClassifier;
 
 @end
 

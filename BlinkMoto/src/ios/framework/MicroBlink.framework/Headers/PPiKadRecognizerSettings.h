@@ -97,6 +97,21 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  */
 @property (nonatomic, assign) BOOL displayFullDocumentImage;
 
+/**
+ * Defines if glare detection should be turned on/off for Malaysian iKad.
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL detectGlare;
+
+/**
+ * Property got setting DPI for full document images
+ * Valid ranges are [100,400]. Setting DPI out of valid ranges throws an exception
+ *
+ * Default: 250.0
+ */
+@property (nonatomic, assign) NSUInteger fullDocumentImageDPI;
+
 @end
 
 NS_ASSUME_NONNULL_END

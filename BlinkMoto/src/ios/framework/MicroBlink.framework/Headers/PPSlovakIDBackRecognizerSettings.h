@@ -24,13 +24,6 @@ PP_CLASS_AVAILABLE_IOS(6.0)
 + (NSString *)FULL_DOCUMENT_IMAGE;
 
 /**
- * Defines if owner's address should be extracted from Slovakian ID
- *
- * Default: YES
- */
-@property (nonatomic, assign) BOOL extractAddress;
-
-/**
  * Defines if owner's surname at birth should be extracted from Slovakian ID
  *
  * Default: YES
@@ -58,6 +51,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO
  */
 @property (nonatomic) BOOL displayFullDocumentImage;
+
+/**
+ * Defines if glare detection should be turned on/off for back side of Slovak IDs.
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL detectGlare;
 
 @end
 

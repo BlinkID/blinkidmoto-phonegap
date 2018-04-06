@@ -80,6 +80,12 @@ typedef NS_ENUM(NSUInteger, PPDocumentPreset) {
 
     /** Preset for detecting A4 documents in landscape */
     PPDocumentPresetA4Landscape,
+    
+    /** Preset for detecting vertical ID1 cards */
+    PPDocumentPresetId1VerticalCard,
+    
+    /** Preset for detecting vertical ID1 cards */
+    PPDocumentPresetId2VerticalCard,
 };
 
 /**
@@ -93,11 +99,10 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Use this initializer for specifiying a document format.
  *
  *  @param aspectRatio  Aspect ratio of the document. Calculated as width / height
- *  @param decodingInfoArray Decoding info for the document
  *
  *  @return initialized object
  */
-- (instancetype)initWithAspectRatio:(CGFloat)aspectRatio decodingInfo:(NSArray<PPDecodingInfo *> *)decodingInfoArray;
+- (instancetype)initWithAspectRatio:(CGFloat)aspectRatio decodingInfo:(NSArray<PPDecodingInfo *> *)decodingInfoArray physicalSizeInInches:(CGFloat)physicalSizeInInches;
 
 
 // unavailable initializer
@@ -165,6 +170,11 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: PPMakeRange(-1, -1);
  */
 @property (nonatomic, assign) PPRange yRange;
+
+/**
+ * Physical size of document in inches
+ */
+@property (nonatomic, assign, readonly) CGFloat physicalSizeInInches;
 
 @end
 

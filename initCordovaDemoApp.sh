@@ -18,7 +18,7 @@ cordova plugin add ../BlinkMoto --variable CAMERA_USAGE_DESCRIPTION="Camera perm
 
 # add android and ios support to the project
 cordova platform add ios
-cordova platform add android@6
+# cordova platform add android@6
 
 # copy content of the www folder
 cp  -f -r ../www .

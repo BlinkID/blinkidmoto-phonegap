@@ -13,10 +13,6 @@
 #import "PPPdf417RecognizerSettings.h"
 #import "PPPdf417RecognizerResult.h"
 
-// USDL
-#import "PPUsdlRecognizerSettings.h"
-#import "PPUsdlRecognizerResult.h"
-
 // ZXing
 #import "PPZXingRecognizerSettings.h"
 #import "PPZXingRecognizerResult.h"
@@ -29,9 +25,9 @@
 #import "PPSimNumberRecognizerSettings.h"
 #import "PPSimNumberRecognizerResult.h"
 
-// Vin
-#import "PPVinRecognizerSettings.h"
-#import "PPVinRecognizerResult.h"
+// Barcode
+#import "PPBarcodeRecognizerSettings.h"
+#import "PPBarcodeRecognizerResult.h"
 
 // Basic functionality
 #import "PPRecognizerResult+Test.h"

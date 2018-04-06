@@ -662,7 +662,7 @@ PP_EXTERN NSString *_Nonnull const kPPDocumentIssueDate;
  that are generally applicable to commercial motor vehicles. If the vehicle is not a
  commercial vehicle, "NONE" is to be entered.
  */
-FOUNDATION_EXPORT NSString *_Nonnull const kPPFederalCommercialVehicleCodes;
+PP_EXTERN NSString *_Nonnull const kPPFederalCommercialVehicleCodes;
 
 /**
  Optional on all AAMVA barcodes.
@@ -678,6 +678,13 @@ FOUNDATION_EXPORT NSString *_Nonnull const kPPFederalCommercialVehicleCodes;
  the IIN or address, must be examined to determine the jurisdiction.
  */
 PP_EXTERN NSString *_Nonnull const kPPIssuingJurisdiction;
+
+/**
+ Optional on all AAMVA and Magnetic barcodes.
+
+ Name of issuing jurisdiction, for example: Alabama, Alaska ...
+ */
+PP_EXTERN NSString *_Nonnull const kPPIssuingJurisdictionName;
 
 /**
  Optional on all AAMVA barcodes.
@@ -921,16 +928,6 @@ PP_EXTERN NSString *_Nonnull const kPPSecurityVersion;
  Raw pdf417 result
  */
 PP_EXTERN NSString *_Nonnull const kPPPdf417;
-
-/**
- Raw code128 result
- */
-PP_EXTERN NSString *_Nonnull const kPPCode128;
-
-/**
- Raw code39 result
- */
-PP_EXTERN NSString *_Nonnull const kPPCode39;
 
 #pragma mark - PPUsdlRecognizerResult implementation
 

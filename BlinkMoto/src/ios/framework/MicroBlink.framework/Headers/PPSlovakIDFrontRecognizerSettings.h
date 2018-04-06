@@ -80,6 +80,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
 @property (nonatomic, assign) BOOL extractIssuedBy;
 
 /**
+ * Defines if issuing document number should be extracted from Slovakian ID
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL extractDocumentNumber;
+
+/**
  * Sets whether face photo from ID card should be sent to didOutputMetadata method of scanDelegate object.
  * If you want to recieve this image, be sure to enable dewarpedImage in MetadataSettings.
  *
@@ -102,5 +109,12 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO
  */
 @property (nonatomic) BOOL displayFullDocumentImage;
+
+/**
+ * Defines if glare detection should be turned on/off for front side of Slovak IDs.
+ *
+ * Default: YES
+ */
+@property (nonatomic, assign) BOOL detectGlare;
 
 @end

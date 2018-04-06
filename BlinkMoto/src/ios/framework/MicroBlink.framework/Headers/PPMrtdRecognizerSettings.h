@@ -7,6 +7,7 @@
 //
 
 #import "PPTemplatingRecognizerSettings.h"
+#import "PPMrzFilter.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -71,6 +72,13 @@ PP_CLASS_AVAILABLE_IOS(6.0)
 @property (nonatomic, assign) BOOL allowUnverifiedResults;
 
 /**
+ * Set this to YES to allow OCR of non-standard characters in MRZ (e.g. '-')
+ *
+ * Default: NO.
+ */
+@property (nonatomic, assign) BOOL allowSpecialCharacters;
+
+/**
  * If YES, MRTD recognizer will determine the position of the whole
  * MRTD document, based on the position of the machine readable zone.
  *
@@ -85,6 +93,21 @@ PP_CLASS_AVAILABLE_IOS(6.0)
  * Default: NO.
  */
 @property (nonatomic, assign) BOOL dewarpFullDocument;
+
+/**
+ * Delegate for mrz filter.
+ *
+ * Default: nil
+ */
+@property (nonatomic, weak) id<PPMrzFilter> mrzFilter;
+
+/**
+ * Property got setting DPI for full document images
+ * Valid ranges are [100,400]. Setting DPI out of valid ranges throws an exception
+ *
+ * Default: 250.0
+ */
+@property (nonatomic, assign) NSUInteger fullDocumentImageDPI;
 
 @end
 
