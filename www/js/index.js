@@ -64,12 +64,12 @@ var app = {
 
                 // Register the callback handler
                 function callback(scanningResult) {
-                alert(JSON.stringify(scanningResult))
+                    // alert(JSON.stringify(scanningResult))
                 },
                 
                 // Register the error callback
                 function errorHandler(err) {
-                alert('Error: ' + err);
+                    alert('Error: ' + err);
                 },
                 
                 licenseiOs, licenseAndroid, translation
@@ -81,12 +81,12 @@ var app = {
 
                 // Register the callback handler
                 function callback(scanningResult) {
-                    alert(JSON.stringify(scanningResult))
+                    // alert(JSON.stringify(scanningResult))
                 },
                 
                 // Register the error callback
                 function errorHandler(err) {
-                alert('Error: ' + err);
+                    alert('Error: ' + err);
                 },
                 
                 licenseiOs, licenseAndroid, translation
