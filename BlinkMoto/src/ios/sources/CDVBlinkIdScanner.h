@@ -20,7 +20,7 @@
 /**
  * Starts VIN scanning process
  */
-- (void)scan:(CDVInvokedUrlCommand *)command;
+- (void)scanVin:(CDVInvokedUrlCommand *)command;
 
 /**
  * Starts License plate scanning process

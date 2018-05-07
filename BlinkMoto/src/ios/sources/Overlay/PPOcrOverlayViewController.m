@@ -7,43 +7,20 @@
 //
 
 #import "PPOcrOverlayViewController.h"
-#import "PPOcrOverlayViewController+Private.h"
 #import "PPScanResultHistory.h"
+#import "PPOcrFinderView.h"
 
-@interface PPOcrOverlayViewController ()<PPOcrFinderViewDelegate>
+@interface PPOcrOverlayViewController () <PPOcrFinderViewDelegate>
 
 @property (strong, nonatomic) PPModernOcrResultOverlaySubview *resultOverlay;
 
+@property (nonatomic, readonly) PPOcrFinderView *viewfinder;
+
 @property (nonatomic) UIInterfaceOrientation interfaceOrientation;
-
-@property (nonatomic) PPImageMetadata *currentImageMetadata;
-
-@property (nonatomic, assign) OcrRecognizerType orcRecognizerType;
-
-@property (nonatomic, strong) PPBlinkOcrRecognizerSettings *ocrRecognizerSettings;
-
-@property (nonatomic, strong) NSDictionary *translation;
-
-@property (nonatomic) PPScanResultHistory *history;
 
 @end
 
-static NSString * const kVinOcrParser = @"VIN OCR Parser";
-static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
-
 @implementation PPOcrOverlayViewController
-
-- (instancetype)initWithOcrRecognizerType:(OcrRecognizerType)ocrRecognizerType andTranslation:(NSDictionary *)translation {
-    self = [super init];
-    if (self) {
-        self.orcRecognizerType = ocrRecognizerType;
-        self.translation = translation;
-        self.history = [[PPScanResultHistory alloc] initWithThreshold:3];
-    }
-    
-    return self;
-}
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -65,14 +42,12 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
     [self.resultOverlay setBackgroundColor:[UIColor clearColor]];
     [self.view insertSubview:self.resultOverlay belowSubview:self.viewfinder];
     [self registerOverlaySubview:self.resultOverlay];
-    
-    [self setupSettingsForRecognizerType];
-    [_viewfinder setTranslation:self.translation];
+
+    [self.viewfinder setTranslation:self.translation];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
     [self setupNotifications];
 }
 
@@ -84,54 +59,22 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [self removeNotifications];
-}
-
-- (void)setupSettingsForRecognizerType {
-    
-    // remove all recognizers
-    [self.coordinator.currentSettings.scanSettings removeAllRecognizerSettings];
-    
-    // Add BlinkOCR Recognizer
-    self.ocrRecognizerSettings = [[PPBlinkOcrRecognizerSettings alloc] init];
-    
-    if (self.orcRecognizerType == VIN) {
-        [self.ocrRecognizerSettings addOcrParser:[[PPVinOcrParserFactory alloc] init] name:kVinOcrParser];
-        [self.coordinator.currentSettings.scanSettings addRecognizerSettings:self.ocrRecognizerSettings];
-        
-        PPVinRecognizerSettings *vinRecognizerSettings = [[PPVinRecognizerSettings alloc] init];
-        [self.coordinator.currentSettings.scanSettings addRecognizerSettings:vinRecognizerSettings];
-    }
-    else if (self.orcRecognizerType == LicensePlate) {
-        [self.ocrRecognizerSettings addOcrParser:[[PPLicensePlatesParserFactory alloc] init] name:kLicensePlateOcrParser];
-        [self.coordinator.currentSettings.scanSettings addRecognizerSettings:self.ocrRecognizerSettings];
-    }
-    
-    self.coordinator.currentSettings.metadataSettings.currentFrame = YES;
-    
-    [self.coordinator applySettings];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    
     [self updateScanningRegion];
 }
 
 - (void)updateScanningRegion {
-    
     [self.view layoutIfNeeded];
-    
-    [self updateScanningRegionArea];
-    
+    self.scanningRegion = self.viewfinder.scanningRegion;
     [UIView animateWithDuration:0.4
                      animations:^{
                          [self.view layoutIfNeeded];
                      }];
-}
-
-- (void)updateScanningRegionArea {
-    self.scanningRegion = self.viewfinder.scanningRegion;
 }
 
 #pragma mark - notifications
@@ -147,27 +90,23 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
+#pragma mark - Rotation
 
 - (BOOL)shouldAutorotate {
     return YES;
 }
 
-
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAllButUpsideDown;
 }
 
-
 - (void)deviceOrientationChanged:(NSNotification *)notification {
-    
     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
-    
     UIInterfaceOrientation orientation = self.interfaceOrientation;
     
     if (UIDeviceOrientationIsPortrait(deviceOrientation)) {
         orientation = UIInterfaceOrientationPortrait;
-    }
-    else if (UIDeviceOrientationIsLandscape(deviceOrientation)) {
+    } else if (UIDeviceOrientationIsLandscape(deviceOrientation)) {
         orientation = deviceOrientation == UIDeviceOrientationLandscapeLeft ? UIInterfaceOrientationLandscapeLeft : UIInterfaceOrientationLandscapeRight;
     }
     
@@ -179,111 +118,21 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
 }
 
 - (void)setInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation animated:(BOOL)animated {
+
     if (self.interfaceOrientation == interfaceOrientation) {
         return;
     }
     
     if (UIInterfaceOrientationIsPortrait(interfaceOrientation)) {
-        
         [self.viewfinder initViewfinderForPortrait];
-        
     } else if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
-
         [self.viewfinder initViewfinderForLandscape];
     }
     
     _interfaceOrientation = interfaceOrientation;
 }
 
-#pragma mark - OverlayViewController stuff
-
-- (void)cameraViewController:(UIViewController<PPScanningViewController> *)cameraViewController didOutputMetadata:(PPMetadata *)metadata {
-    
-    if ([metadata isKindOfClass:[PPImageMetadata class]]) {
-        PPImageMetadata *imageMetadata = (PPImageMetadata *)metadata;
-        if (imageMetadata.imageType == PPImageMetadataTypeSuccessfulFrame) {
-            self.currentImageMetadata = imageMetadata;
-        }
-    }
-}
-
-- (BOOL)string:(NSString *)string hasDigitsOnIndexes:(NSArray<NSNumber *> *)indexes {
-    for (NSNumber *index in indexes) {
-        if (isdigit([string characterAtIndex:[index intValue]])) {
-            return true;
-        }
-    }
-    return false;
-}
-
-- (BOOL)isVinStandard:(NSString *)vin {
-    unichar c = [vin characterAtIndex:0];
-
-    if (c == 'I') {
-        NSLog(@"Vin starts with I");
-        return NO;
-    }
-
-    if ([self string:vin hasDigitsOnIndexes:@[@(0), @(1), @(2)]]) {
-        NSLog(@"VIN has digits in first three places!");
-        return NO;
-    }
-
-    return YES;
-}
-
-- (void)cameraViewController:(UIViewController<PPScanningViewController> *)cameraViewController didOutputResults:(NSArray *)results {
-    
-    // First we check that we received a valid result!
-    if (results == nil || results.count == 0) {
-        return;
-    }
-    
-    // then, pause scanning until we process all the results
-    [cameraViewController pauseScanning];
-    
-    for (PPRecognizerResult *result in results) {
-        NSString *resultVin;
-        BOOL success = NO;
-        if ([result isKindOfClass:[PPBlinkOcrRecognizerResult class]]) {
-            PPBlinkOcrRecognizerResult *ocrRecognizerResult = (PPBlinkOcrRecognizerResult *)result;
-
-            switch (self.orcRecognizerType) {
-                case VIN:
-                    resultVin = [ocrRecognizerResult parsedResultForName:kVinOcrParser];
-                    if ([self isVinStandard:resultVin]) {
-                        success = [self.history pushResult:resultVin];
-                    }
-                    break;
-                case LicensePlate:
-                    resultVin =  [ocrRecognizerResult parsedResultForName:kLicensePlateOcrParser];
-                    success = [self.history pushResult:resultVin];
-                    break;
-                default:
-                    resultVin =  @"";
-                    success = NO;
-                    break;
-            }
-            
-            
-        }
-        if ([result isKindOfClass:[PPVinRecognizerResult class]]) {
-            PPVinRecognizerResult *vinRecognizerResult = (PPVinRecognizerResult *)result;
-            resultVin = vinRecognizerResult.vinNumber;
-            success = [self.history pushResult:resultVin];
-        }
-        if (success) {
-            [self.history resetState];
-            [_viewfinder setOcrResultSucces:success withResult:resultVin andImage:self.currentImageMetadata.image];
-        } else {
-            [cameraViewController resumeScanningAndResetState:YES];
-        }
-        
-    }
-}
-
 #pragma mark - PPOcrFinderViewDelegate
-
 
 - (BOOL)viewfinderViewIsScanningPaused:(PPOcrFinderView *)viewfinderView {
     return [self.containerViewController isScanningPaused];
@@ -291,7 +140,7 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
 
 - (void)viewfinderViewDidTapAcceptButton:(UIButton *)sender {
     if ([[self.viewfinder getScanningResult] length] > 0) {
-        [self.delegate ocrOverlayViewControllerDidReturnResult:[_viewfinder getScanningResult]];
+        [self.delegate ocrOverlayViewControllerDidReturnResult:[self.viewfinder getScanningResult]];
     }
 }
 
@@ -300,8 +149,15 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
 }
 
 - (void)viewfinderViewDidTapRepeatButton:(UIButton *)sender {
-    [_viewfinder resetScanningState];
-    [self.scanningViewController resumeScanningAndResetState:YES];
+    [self.viewfinder resetScanningState];
+    [self.containerViewController resumeScanningAndResetState:YES];
+}
+
+#pragma mark - PPBlinkIDScannerDelegate
+
+- (void)blinkIdScanner:(PPBlinkIDScanner *)scanner didOutputResult:(NSString *)result fromImage:(UIImage *)image {
+    [self.containerViewController pauseScanning];
+    [self.viewfinder setOcrResultSucces:YES withResult:result andImage:image];
 }
 
 @end
