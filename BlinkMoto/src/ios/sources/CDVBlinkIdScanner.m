@@ -34,7 +34,7 @@
 
 #pragma mark - Main
 
-- (void)scanVin:(CDVInvokedUrlCommand *)command {
+- (void)scan:(CDVInvokedUrlCommand *)command {
     [self setLastCommand:command];
     [self presentFormScannerWithParserType:PPParserTypeVin];
 }
