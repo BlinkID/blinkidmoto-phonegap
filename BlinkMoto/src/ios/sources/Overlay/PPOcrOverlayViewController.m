@@ -125,8 +125,6 @@
     
     if (UIInterfaceOrientationIsPortrait(interfaceOrientation)) {
         [self.viewfinder initViewfinderForPortrait];
-    } else if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
-        [self.viewfinder initViewfinderForLandscape];
     }
     
     _interfaceOrientation = interfaceOrientation;

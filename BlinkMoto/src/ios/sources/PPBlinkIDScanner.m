@@ -70,7 +70,7 @@ static NSString * const kLicensePlateOcrParser = @"License Plate OCR Parser";
                                                       coordinator:self.coordinator
                                                             error:nil];
     scanningViewController.autorotate = YES;
-    scanningViewController.supportedOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
+    scanningViewController.supportedOrientations = UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
 
     return scanningViewController;
 }
