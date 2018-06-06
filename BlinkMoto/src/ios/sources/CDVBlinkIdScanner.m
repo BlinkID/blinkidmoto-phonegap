@@ -19,12 +19,12 @@
 
 #import "CDVBlinkIdScanner.h"
 
-#import <MicroBlink/MicroBlink.h>
 #import "PPOcrOverlayViewController.h"
+#import "PPBlinkIDScanner.h"
 
 @interface CDVBlinkIdScanner () <PPOcrOverlayViewControllerDelegate>
 
-@property (nonatomic) NSMutableArray *scanElements;
+@property (nonatomic) PPBlinkIDScanner *scanner;
 
 @property (nonatomic, retain) CDVInvokedUrlCommand *lastCommand;
 
@@ -35,89 +35,60 @@
 #pragma mark - Main
 
 - (void)scan:(CDVInvokedUrlCommand *)command {
-
     [self setLastCommand:command];
-    
-    PPCameraCoordinator *coordinator = [self createCordinator];
-    [self presentFormScannerWithCoordinator:coordinator andOcrParserType:VIN];
+    [self presentFormScannerWithParserType:PPParserTypeVin];
 }
 
 - (void)scanLicensePlate:(CDVInvokedUrlCommand *)command {
-    
     [self setLastCommand:command];
-    
-    PPCameraCoordinator *coordinator = [self createCordinator];
-    [self presentFormScannerWithCoordinator:coordinator andOcrParserType:LicensePlate];
+    [self presentFormScannerWithParserType:PPParserTypeLicensePlate];
+}
+
+- (void)isScanningUnsupportedForCameraType:(CDVInvokedUrlCommand *)command {
+    NSError *error;
+    CDVPluginResult *result = nil;
+
+    if ([PPCameraCoordinator isScanningUnsupportedForCameraType:PPCameraTypeBack error:&error]) {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"Error: %@ Code:%ld", error.localizedDescription, (long)error.code]];
+    } else {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    }
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 #pragma mark - initiate scan
 
-- (PPCameraCoordinator *)createCordinator {
+- (void)presentFormScannerWithParserType:(PPParserType)parserType {
 
     NSError *error;
-
-    if ([PPCameraCoordinator isScanningUnsupportedForCameraType:PPCameraTypeBack error:&error]) {
-        NSString *messageString = [error localizedDescription];
-        
+    if ([PPBlinkIDScanner isScanningUnsupportedWithError:&error]) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Warning"
-                                                                                 message:messageString
+                                                                                 message:[error localizedDescription]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        {
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK"
-                                                                   style: UIAlertActionStyleDefault
-                                                                 handler:^(UIAlertAction * _Nonnull action) {
-            }];
-            [alertController addAction:cancelAction];
-        }
-        
+
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK"
+                                                               style: UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                                                                 // nothing here
+                                                             }];
+        [alertController addAction:cancelAction];
+
         [[self viewController] presentViewController:alertController animated:YES completion:nil];
-        
-        return nil;
     }
-    
-    PPSettings *settings = [[PPSettings alloc] init];
-    settings.licenseSettings.licenseKey = [self.lastCommand argumentAtIndex:0];
-    settings.metadataSettings.successfulFrame = YES;
-    PPCameraCoordinator *coordinator = [[PPCameraCoordinator alloc] initWithSettings:settings];
-    return coordinator;
-}
 
-- (void)presentFormScannerWithCoordinator:(PPCameraCoordinator *)coordinator andOcrParserType:(OcrRecognizerType)ocrRecognizerType {
-    
-    if (coordinator == nil) {
-        return;
-    }
-    
-    NSDictionary *translation = [self.lastCommand argumentAtIndex:2];
-    PPOcrOverlayViewController *overlayVC = [[PPOcrOverlayViewController alloc] initWithOcrRecognizerType:ocrRecognizerType andTranslation:translation];
-    overlayVC.coordinator = coordinator;
+    PPOcrOverlayViewController *overlayVC = [[PPOcrOverlayViewController alloc] init];
+    overlayVC.translation = [self.lastCommand argumentAtIndex:2];
     overlayVC.delegate = self;
+
+    self.scanner = [[PPBlinkIDScanner alloc] initWithLicenseKey:[self.lastCommand argumentAtIndex:0]
+                                                     parserType:parserType
+                                                   vinValidator:[[PPDaimlerVinValidator alloc] init]
+                                                       delegate:overlayVC];
     
-    UIViewController<PPScanningViewController> *scanningViewController =
-    [PPViewControllerFactory cameraViewControllerWithDelegate:nil
-                                        overlayViewController:overlayVC
-                                                  coordinator:coordinator
-                                                        error:nil];
-    scanningViewController.autorotate = YES;
-    scanningViewController.supportedOrientations = UIInterfaceOrientationMaskAllButUpsideDown;
-    overlayVC.scanningViewController = scanningViewController;
+    UIViewController *scanningViewController = [self.scanner createScanningViewControllerWithOverlayViewController:overlayVC];
+
     [[self viewController] presentViewController:scanningViewController animated:YES completion:nil];
-    
-    
-}
-
-#pragma mark - PPOcrOverlayViewControllerDelegate
-- (void)ocrOverlayViewControllerWillClose:(PPOcrOverlayViewController *)vc {
-    [[self viewController] dismissViewControllerAnimated:YES completion:nil];
-    
-    [self returnAsCancelled:YES withScanResult:nil];
-}
-
-- (void)ocrOverlayViewControllerDidReturnResult:(NSString *)scanResult {
-    [[self viewController] dismissViewControllerAnimated:YES completion:nil];
-    
-    [self returnAsCancelled:NO withScanResult:scanResult];
 }
 
 #pragma mark - return results
@@ -136,19 +107,16 @@
     [self.commandDelegate sendPluginResult:result callbackId:self.lastCommand.callbackId];
 }
 
-#pragma mark - check scanning supported
-- (void)isScanningUnsupportedForCameraType:(CDVInvokedUrlCommand *)command {
-    NSError *error;
-    CDVPluginResult *result = nil;
-    if ([PPCameraCoordinator isScanningUnsupportedForCameraType:PPCameraTypeBack error:&error]) {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"Error: %@ Code:%ld", error.localizedDescription, (long)error.code]];
-    }
-    else {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    }
-    
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+#pragma mark - PPOcrOverlayViewControllerDelegate
 
+- (void)ocrOverlayViewControllerWillClose:(PPOcrOverlayViewController *)vc {
+    [[self viewController] dismissViewControllerAnimated:YES completion:nil];
+    [self returnAsCancelled:YES withScanResult:nil];
+}
+
+- (void)ocrOverlayViewControllerDidReturnResult:(NSString *)scanResult {
+    [[self viewController] dismissViewControllerAnimated:YES completion:nil];
+    [self returnAsCancelled:NO withScanResult:scanResult];
 }
 
 @end

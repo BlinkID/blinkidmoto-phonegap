@@ -6,20 +6,15 @@
 //  Copyright © 2017 MicroBlink. All rights reserved.
 //
 
-#import "PPOcrFinderView+Private.h"
+#import "PPOcrFinderView.h"
 
-@interface PPOcrFinderView()
+@interface PPOcrFinderView ()
 
 @property (nonatomic) NSLayoutConstraint *messageConstraintTop;
 @property (nonatomic) NSLayoutConstraint *resultMessageConstraintBottom;
 
 @property (nonatomic) NSLayoutConstraint *messageConstraintWidth;
 @property (nonatomic) NSLayoutConstraint *resultMessageConstraintWidth;
-
-@property (nonatomic) UIImageView *viewfinderCornerTopLeft;
-@property (nonatomic) UIImageView *viewfinderCornerTopRight;
-@property (nonatomic) UIImageView *viewfinderCornerBottomLeft;
-@property (nonatomic) UIImageView *viewfinderCornerBottomRight;
 
 @property (nonatomic) CGFloat originalViewfinderWidth;
 @property (nonatomic) CGFloat originalViewfinderHeight;
@@ -39,6 +34,12 @@
 @property (nonatomic, readonly) NSLayoutConstraint *resultImageVerticalAlignmentConstraint;
 @property (nonatomic, readonly) NSLayoutConstraint *resultImageViewWidthConstraint;
 @property (nonatomic, readonly) NSLayoutConstraint *resultImageViewHeightConstraint;
+
+@property (nonatomic, readonly) NSLayoutConstraint *viewfinderWidthConstraint;
+@property (nonatomic, readonly) NSLayoutConstraint *viewfinderHeightConstraint;
+
+@property (nonatomic, readonly) NSLayoutConstraint *viewfinderHorizontalAlignmentConstraint;
+@property (nonatomic, readonly) NSLayoutConstraint *viewfinderVerticalAlignmentConstraint;
 
 @end
 
@@ -297,8 +298,7 @@ static NSString * const kAcceptText = @"accept_text";
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         textSize = 20.0f;
-    }
-    else {
+    } else {
         textSize = 14.0f;
     }
     
@@ -352,8 +352,7 @@ static NSString * const kAcceptText = @"accept_text";
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         textSize = 28.0f;
-    }
-    else {
+    } else {
         textSize = 22.0f;
     }
     
@@ -664,10 +663,10 @@ static NSString * const kAcceptText = @"accept_text";
 }
 
 - (void)initViewfinderForLandscape {
-    self.viewfinderWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width*0.95 : self.bounds.size.width * 0.95;
+    self.viewfinderWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width * 0.85 : self.bounds.size.width * 0.90;
     self.viewfinderHeightConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ?  self.bounds.size.height * 0.1 : self.bounds.size.height * 0.3;
     
-    self.resultImageViewWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width*0.95 : self.bounds.size.width * 0.95;
+    self.resultImageViewWidthConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? self.bounds.size.width * 0.85 : self.bounds.size.width * 0.90;
     self.resultImageViewHeightConstraint.constant = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ?  self.bounds.size.height * 0.1 : self.bounds.size.height * 0.3;
     
     self.viewfinderHorizontalAlignmentConstraint.constant = 0;

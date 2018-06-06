@@ -7,33 +7,20 @@
 //
 
 #import <MicroBlink/MicroBlink.h>
-#import "PPOcrFinderView.h"
 
-typedef NS_ENUM(NSInteger, OcrRecognizerType) {
-    VIN,
-    LicensePlate
-};
+#import "PPBlinkIDScanner.h"
 
 @protocol PPOcrOverlayViewControllerDelegate;
 
-@interface PPOcrOverlayViewController : PPBaseOverlayViewController
-
-- (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithOcrRecognizerType:(OcrRecognizerType)ocrRecognizerType andTranslation:(NSDictionary *)translation;
-
-// needs to be weak to avoid a reference cycle
-@property (nonatomic, weak) PPCoordinator *coordinator;
+@interface PPOcrOverlayViewController : PPBaseOverlayViewController<PPBlinkIDScannerDelegate>
 
 /**
  * Delegate which is notified with important UI events
  */
 @property (nonatomic, weak) id<PPOcrOverlayViewControllerDelegate> delegate;
 
-
-/**
- * Property for scanning view controller to gain features for pausing and resuming camera
- */
-@property (nonatomic, strong) UIViewController<PPScanningViewController> *scanningViewController;
+/** Dictionary with translation strings */
+@property (nonatomic, strong) NSDictionary *translation;
 
 @end
 
@@ -41,6 +28,8 @@ typedef NS_ENUM(NSInteger, OcrRecognizerType) {
  * Protocol for observing important events with scanning
  */
 @protocol PPOcrOverlayViewControllerDelegate
+
+@required
 
 /**
  * Called when Overlay will close. This can happen if the user pressed close button
@@ -55,7 +44,5 @@ typedef NS_ENUM(NSInteger, OcrRecognizerType) {
  * Called when Accept button is tapped to return scanning VIN/License plate result
  */
 - (void)ocrOverlayViewControllerDidReturnResult:(NSString *)scanResult;
-
-
 
 @end

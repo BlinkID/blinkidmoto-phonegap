@@ -78,16 +78,18 @@
     <hook type="after_platform_add" src="addEmbedded.js" />
 
     <platform name="ios">
-        <source-file src="src/ios/sources/CDVBlinkIdScanner.m" />
-        <header-file src="src/ios/sources/CDVBlinkIdScanner.h" />
-        <source-file src="src/ios/sources/Overlay/PPOcrFinderView.m" />
-        <header-file src="src/ios/sources/Overlay/PPOcrFinderView.h" />
-        <header-file src="src/ios/sources/Overlay/PPOcrFinderView+Private.h" />
-        <source-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.m" />
-        <header-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.h" />
-        <header-file src="src/ios/sources/Overlay/PPOcrOverlayViewController+Private.h" />
+        <source-file src="src/ios/sources/CDVBlinkIDScanner.m" />
+        <header-file src="src/ios/sources/CDVBlinkIDScanner.h" />
+        <source-file src="src/ios/sources/PPBlinkIDScanner.m" />
+        <header-file src="src/ios/sources/PPBlinkIDScanner.h" />
         <header-file src="src/ios/sources/PPScanResultHistory.h" />
         <source-file src="src/ios/sources/PPScanResultHistory.m" />
+        <header-file src="src/ios/sources/PPVinValidator.h" />
+        <source-file src="src/ios/sources/PPVinValidator.m" />
+        <source-file src="src/ios/sources/Overlay/PPOcrFinderView.m" />
+        <header-file src="src/ios/sources/Overlay/PPOcrFinderView.h" />
+        <source-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.m" />
+        <header-file src="src/ios/sources/Overlay/PPOcrOverlayViewController.h" />
         
         <framework src="libc++.dylib" />
         <framework src="libz.dylib" />
